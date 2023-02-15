@@ -11,7 +11,7 @@ public class DeadZone : SingletonMonobehaviour<DeadZone>
         public int chipTeamID;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent(out Chip chip))
         {

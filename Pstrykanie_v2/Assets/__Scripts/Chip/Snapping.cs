@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,8 @@ using UnityEngine.EventSystems;
 
 public class Snapping : MonoBehaviour
 {
+    private Chip chip;
+
     [SerializeField] Transform launchPoint;
     [SerializeField] LineRenderer line;
 
@@ -18,9 +21,12 @@ public class Snapping : MonoBehaviour
     private Vector3 currentPosition;
     private Vector3 snapForce;
 
+    private bool isSnapped = false;
+
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
+        chip = GetComponent<Chip>();
     }
 
     private void Start()
@@ -35,6 +41,15 @@ public class Snapping : MonoBehaviour
     private void Update()
     {
         CheckForInput();
+
+        if (isSnapped)
+        {
+            if (rigidBody.IsSleeping() || !chip.IsPlaying())
+            {
+                isSnapped = false;
+                GameManager.Instance.ChangeGameState(chip.GetChipTeamID());
+            }
+        }
     }
 
     private void OnMouseEnter()
@@ -49,13 +64,19 @@ public class Snapping : MonoBehaviour
 
     private void OnMouseDown()
     {
-        isMouseDown = true;
+        if (GameManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        {
+            isMouseDown = true;
+        }
     }
 
     private void OnMouseUp()
     {
-        isMouseDown = false;
-        Snap();
+        if (GameManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        {
+            isMouseDown = false;
+            Snap();
+        }
     }
 
     private void CheckForInput()
@@ -104,6 +125,19 @@ public class Snapping : MonoBehaviour
     {
         rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
         line.gameObject.SetActive(false);
+
+        GameManager.Instance.SetCurrentGameState(GameManager.GameState.Waiting);
+
+        if (chip.GetChipTeamID() == 1)
+        {
+            GameManager.Instance.SetPreviousGameState(GameManager.GameState.TeamOneTurn);
+        }
+        else
+        {
+            GameManager.Instance.SetPreviousGameState(GameManager.GameState.TeamTwoTurn);
+        }
+
+        isSnapped = true;
     }
   
     private void OnCollisionEnter(Collision collision)
