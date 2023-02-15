@@ -11,6 +11,9 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     [SerializeField] List<Transform> teamTwoSpawnPositions = new List<Transform>();
     [SerializeField] private Chip ChipPrefab;
 
+    private int chipTeamOneCount;
+    private int chipTeamTwoCount;
+
     protected override void Awake()
     {
         base.Awake();
@@ -19,6 +22,22 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     private void Start()
     {
         InitializeTeams();
+
+        DeadZone.Instance.OnChipFall += DeadZone_OnChipFall;
+    }
+
+    private void DeadZone_OnChipFall(object sender, DeadZone.OnChipFallArgs args)
+    {
+        if (args.chipTeamID == 1)
+        {
+            chipTeamOneCount--;
+        }
+        else
+        {
+            chipTeamTwoCount--;
+        }
+
+        CheckForGameOver();
     }
 
     private void InitializeTeams()
@@ -26,13 +45,31 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         for (int i = 0; i < teamOneChips.Count; i++)
         {
             Chip chip = Instantiate(ChipPrefab, teamOneSpawnPositions[i].position, Quaternion.identity);
-            chip.InitializeChip(teamOneChips[i]);
+            chip.InitializeChip(teamOneChips[i], 1);
         }
 
         for (int i = 0; i < teamTwoChips.Count; i++)
         {
             Chip chip = Instantiate(ChipPrefab, teamTwoSpawnPositions[i].position, Quaternion.identity);
-            chip.InitializeChip(teamTwoChips[i]);
+            chip.InitializeChip(teamTwoChips[i], 2);
+        }
+
+        chipTeamOneCount = teamOneChips.Count;
+        chipTeamTwoCount = teamTwoChips.Count;
+    }
+
+    private void CheckForGameOver()
+    {
+        if (chipTeamOneCount == 0)
+        {
+            //Team Two WIN!
+            Debug.Log("Team TWO WIN!");
+        }
+
+        if (chipTeamTwoCount == 0)
+        {
+            //Team One WIN!
+            Debug.Log("Team ONE WIN!");
         }
     }
 }

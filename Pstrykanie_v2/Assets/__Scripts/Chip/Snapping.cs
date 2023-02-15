@@ -32,6 +32,11 @@ public class Snapping : MonoBehaviour
         line.SetPosition(1, launchPoint.position);
     }
 
+    private void Update()
+    {
+        CheckForInput();
+    }
+
     private void OnMouseEnter()
     {
         launchPoint.gameObject.SetActive(true);
@@ -53,7 +58,7 @@ public class Snapping : MonoBehaviour
         Snap();
     }
 
-    private void Update()
+    private void CheckForInput()
     {
         if (isMouseDown)
         {

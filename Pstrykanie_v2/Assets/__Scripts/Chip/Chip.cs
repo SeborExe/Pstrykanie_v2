@@ -9,6 +9,9 @@ public class Chip : MonoBehaviour
     Snapping snapping;
     MeshCollider meshCollider;
 
+    private int chipTeamID;
+    private bool isPlaying = true;
+
     private void Awake()
     {
         chipRenderer = GetComponent<Renderer>();
@@ -17,7 +20,7 @@ public class Chip : MonoBehaviour
         meshCollider = GetComponent<MeshCollider>();
     }
 
-    public void InitializeChip(ChipSO chipDetails)
+    public void InitializeChip(ChipSO chipDetails, int chipTeamID)
     {
         chipRenderer.material.SetTexture("_BaseMap", chipDetails.Image.texture);
         transform.localScale = chipDetails.size;
@@ -28,5 +31,22 @@ public class Chip : MonoBehaviour
         snapping.SetStreatch(chipDetails.maxStretch);
         snapping.SetPushPower(chipDetails.pushPower);
         snapping.SetMass(chipDetails.mass);
+
+        this.chipTeamID = chipTeamID;
+    }
+
+    public int GetChipTeamID()
+    {
+        return chipTeamID;
+    }
+
+    public bool IsPlaying()
+    {
+        return isPlaying;
+    }
+
+    public void DeDeactivateChip()
+    {
+        isPlaying = false;
     }
 }

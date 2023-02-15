@@ -251,6 +251,64 @@ Transform:
   m_Father: {fileID: 1524634810}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &325664282
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 325664285}
+  - component: {fileID: 325664284}
+  - component: {fileID: 325664283}
+  m_Layer: 0
+  m_Name: DeadZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &325664283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325664282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f98c60ab9b6615458ad96743481081c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &325664284
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325664282}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 500, y: 2, z: 500}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &325664285
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325664282}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -40, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1071,7 +1129,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 140, y: 1, z: 220.5}
+  m_Size: {x: 139, y: 1, z: 220}
   m_Center: {x: 0, y: 52, z: 0}
 --- !u!54 &1146456580
 Rigidbody:
@@ -1190,9 +1248,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamOneChips:
-  - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
-  - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
-  - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
+  - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
+  - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
+  - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
   teamTwoChips:
   - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
   - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
