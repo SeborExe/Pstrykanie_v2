@@ -13,6 +13,8 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         GameOver
     }
 
+    public event EventHandler OnStateChanged;
+
     private GameState currentState;
     private GameState previousGameState;
 
@@ -93,12 +95,14 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         {
             //Team Two WIN!
             Debug.Log("Team TWO WIN!");
+            currentState = GameState.GameOver;
         }
 
         if (chipTeamTwoCount == 0)
         {
             //Team One WIN!
             Debug.Log("Team ONE WIN!");
+            currentState = GameState.GameOver;
         }
     }
 
@@ -116,25 +120,31 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         else return 0;
     }
 
-    public void SetCurrentGameState(GameState gameState)
+    public void ChangeGameState(int chipID, bool wait = false)
     {
-        currentState = gameState;
-    }
-
-    public void SetPreviousGameState(GameState gameState)
-    {
-        previousGameState = gameState;
-    }
-
-    public void ChangeGameState(int chipID)
-    {
-        if (chipID == 1)
+        if (chipID == 1 && !wait)
         {
             currentState = GameState.TeamTwoTurn;
+            previousGameState = GameState.Waiting;
+        }
+        else if (chipID == 2 && !wait)
+        {
+            currentState = GameState.TeamOneTurn;
+            previousGameState = GameState.Waiting;
         }
         else
         {
-            currentState = GameState.TeamOneTurn;
+            currentState = GameState.Waiting;
+            if (chipID == 1)
+            {
+                previousGameState = GameState.TeamOneTurn;
+            }
+            else
+            {
+                previousGameState = GameState.TeamTwoTurn;
+            }
         }
+
+        OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 }

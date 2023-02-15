@@ -126,17 +126,7 @@ public class Snapping : MonoBehaviour
         rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
         line.gameObject.SetActive(false);
 
-        GameManager.Instance.SetCurrentGameState(GameManager.GameState.Waiting);
-
-        if (chip.GetChipTeamID() == 1)
-        {
-            GameManager.Instance.SetPreviousGameState(GameManager.GameState.TeamOneTurn);
-        }
-        else
-        {
-            GameManager.Instance.SetPreviousGameState(GameManager.GameState.TeamTwoTurn);
-        }
-
+        GameManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
         isSnapped = true;
     }
   
