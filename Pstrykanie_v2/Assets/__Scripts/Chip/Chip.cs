@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Chip : MonoBehaviour
 {
-    [SerializeField] ChipSO chipDetails;
-
     Renderer chipRenderer;
     Rigidbody rigidBody;
     Snapping snapping;
@@ -17,11 +15,9 @@ public class Chip : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         snapping = GetComponent<Snapping>();
         meshCollider = GetComponent<MeshCollider>();
-
-        InitializeChip();
     }
 
-    private void InitializeChip()
+    public void InitializeChip(ChipSO chipDetails)
     {
         chipRenderer.material.SetTexture("_BaseMap", chipDetails.Image.texture);
         transform.localScale = chipDetails.size;
