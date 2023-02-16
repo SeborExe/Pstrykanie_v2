@@ -6,27 +6,37 @@ using UnityEngine.EventSystems;
 
 public class Snapping : MonoBehaviour
 {
+    private enum ChipState
+    {
+        Idle, 
+        Moving
+    }
+
     private Chip chip;
 
     [SerializeField] Transform launchPoint;
-    [SerializeField] LineRenderer line;
+
+    private LineRenderer line;
+    private LineVisual lineVisual;
 
     private float speed;
     private float streatch;
     private float pushPower;
     private float mass;
+    private ChipState currentState = ChipState.Idle;
 
     private bool isMouseDown;
     private Rigidbody rigidBody;
     private Vector3 currentPosition;
     private Vector3 snapForce;
 
-    private bool isSnapped = false;
-
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
         chip = GetComponent<Chip>();
+
+        line = GetComponentInChildren<LineRenderer>();
+        lineVisual = line.GetComponent<LineVisual>();
     }
 
     private void Start()
@@ -42,12 +52,12 @@ public class Snapping : MonoBehaviour
     {
         CheckForInput();
 
-        if (isSnapped)
+        if (currentState == ChipState.Moving)
         {
             if (rigidBody.IsSleeping() || !chip.IsPlaying())
             {
-                isSnapped = false;
                 GameManager.Instance.ChangeGameState(chip.GetChipTeamID());
+                currentState = ChipState.Idle;
             }
         }
     }
@@ -88,8 +98,6 @@ public class Snapping : MonoBehaviour
             line.gameObject.SetActive(true);
 
             currentPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            snapForce = (currentPosition - launchPoint.position) * speed * -1;
-
             SetStrips(currentPosition);
         }
         else
@@ -117,6 +125,11 @@ public class Snapping : MonoBehaviour
 
         Vector3 endPoint = launchPoint.position + direction; // Obliczamy koñcow¹ pozycjê linii
         endPoint.y = 0f; // Ustawiamy Y na 0, aby koñcówka linii by³a na p³aszczyŸnie XZ
+
+        snapForce = (endPoint - launchPoint.position) * speed * -1;
+
+        lineVisual.ChangeLineColor(direction, streatch);
+
         line.SetPosition(0, launchPoint.position);
         line.SetPosition(1, endPoint);
     }
@@ -127,9 +140,9 @@ public class Snapping : MonoBehaviour
         line.gameObject.SetActive(false);
 
         GameManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
-        isSnapped = true;
+        currentState = ChipState.Moving;
     }
-  
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Chip" && collision.gameObject.TryGetComponent(out Rigidbody enemyRigidbody))

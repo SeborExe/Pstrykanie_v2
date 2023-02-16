@@ -50,11 +50,6 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         DeadZone.Instance.OnChipFall += DeadZone_OnChipFall;
     }
 
-    private void Update()
-    {
-        Debug.Log(currentState);
-    }
-
     private void DeadZone_OnChipFall(object sender, DeadZone.OnChipFallArgs args)
     {
         if (args.chipTeamID == 1)
@@ -96,6 +91,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
             //Team Two WIN!
             Debug.Log("Team TWO WIN!");
             currentState = GameState.GameOver;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         if (chipTeamTwoCount == 0)
@@ -103,6 +99,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
             //Team One WIN!
             Debug.Log("Team ONE WIN!");
             currentState = GameState.GameOver;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -122,12 +119,12 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public void ChangeGameState(int chipID, bool wait = false)
     {
-        if (chipID == 1 && !wait)
+        if (chipID == 1 && !wait && chipTeamTwoCount != 0)
         {
             currentState = GameState.TeamTwoTurn;
             previousGameState = GameState.Waiting;
         }
-        else if (chipID == 2 && !wait)
+        else if (chipID == 2 && !wait && chipTeamOneCount != 0)
         {
             currentState = GameState.TeamOneTurn;
             previousGameState = GameState.Waiting;
