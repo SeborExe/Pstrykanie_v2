@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,19 +29,13 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
 
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+
     protected override void Awake()
     {
         base.Awake();
 
-        int startingTeam = UnityEngine.Random.Range(1, 3);
-        if (startingTeam == 1)
-        {
-            currentState = GameState.TeamOneTurn;
-        }
-        else
-        {
-            currentState = GameState.TeamTwoTurn;
-        }
+        RollStartingTeam();
     }
 
     private void Start()
@@ -84,6 +79,19 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         chipTeamTwoCount = teamTwoChips.Count;
     }
 
+    private void RollStartingTeam()
+    {
+        int startingTeam = UnityEngine.Random.Range(1, 3);
+        if (startingTeam == 1)
+        {
+            currentState = GameState.TeamOneTurn;
+        }
+        else
+        {
+            currentState = GameState.TeamTwoTurn;
+        }
+    }
+
     private void CheckForGameOver()
     {
         if (chipTeamOneCount == 0)
@@ -119,12 +127,12 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public void ChangeGameState(int chipID, bool wait = false)
     {
-        if (chipID == 1 && !wait && chipTeamTwoCount != 0)
+        if (chipID == 1 && !wait && (chipTeamTwoCount != 0 && chipTeamOneCount != 0))
         {
             currentState = GameState.TeamTwoTurn;
             previousGameState = GameState.Waiting;
         }
-        else if (chipID == 2 && !wait && chipTeamOneCount != 0)
+        else if (chipID == 2 && !wait && (chipTeamTwoCount != 0 && chipTeamOneCount != 0))
         {
             currentState = GameState.TeamOneTurn;
             previousGameState = GameState.Waiting;
@@ -143,5 +151,11 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         }
 
         OnStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void ShakeCamera(float amplitude, float frequency, float time)
+    {
+        CinemachineShake cinemachineShake = virtualCamera.GetComponent<CinemachineShake>();
+        cinemachineShake.ShakeCamera(amplitude, frequency, time);
     }
 }

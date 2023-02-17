@@ -51,15 +51,7 @@ public class Snapping : MonoBehaviour
     private void Update()
     {
         CheckForInput();
-
-        if (currentState == ChipState.Moving)
-        {
-            if (rigidBody.IsSleeping() || !chip.IsPlaying())
-            {
-                GameManager.Instance.ChangeGameState(chip.GetChipTeamID());
-                currentState = ChipState.Idle;
-            }
-        }
+        CheckChipState();
     }
 
     private void OnMouseEnter()
@@ -106,6 +98,25 @@ public class Snapping : MonoBehaviour
         }
     }
 
+        private void CheckChipState()
+    {
+        if (currentState == ChipState.Moving)
+        {
+            if (GameManager.Instance.GetCurrentGameState() == GameManager.GameState.GameOver)
+            {
+                currentState = ChipState.Idle;
+                return;
+            }
+
+            else if (rigidBody.IsSleeping() || !chip.IsPlaying())
+            {
+                GameManager.Instance.ChangeGameState(chip.GetChipTeamID());
+                currentState = ChipState.Idle;
+                gameObject.tag = "Chip";
+            }
+        }
+    }
+
     private void ResetStrips()
     {
         line.SetPosition(0, transform.position);
@@ -141,15 +152,16 @@ public class Snapping : MonoBehaviour
 
         GameManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
         currentState = ChipState.Moving;
+        gameObject.tag = "Player";
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Chip" && collision.gameObject.TryGetComponent(out Rigidbody enemyRigidbody))
         {
-            Vector3 direction = collision.transform.position - transform.position;
-            direction = direction.normalized;
-            enemyRigidbody.AddForce(direction * pushPower * rigidBody.velocity.z * mass);
+            Vector3 direction = (collision.transform.position - transform.position).normalized;
+            float pushForce = pushPower * Mathf.Abs(rigidBody.velocity.z) * mass;
+            enemyRigidbody.AddForce(direction * pushForce);
         }
     } 
 
