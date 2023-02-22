@@ -102,7 +102,7 @@ public class Snapping : MonoBehaviour
     {
         if (currentState == ChipState.Moving)
         {
-            if (GameManager.Instance.GetCurrentGameState() == GameManager.GameState.GameOver)
+            if (GameTourManager.Instance.GetCurrentGameState() == GameState.GameOver)
             {
                 currentState = ChipState.Idle;
                 return;
@@ -110,7 +110,7 @@ public class Snapping : MonoBehaviour
 
             else if (rigidBody.IsSleeping() || !chip.IsPlaying())
             {
-                GameManager.Instance.ChangeGameState(chip.GetChipTeamID());
+                GameTourManager.Instance.ChangeGameState(chip.GetChipTeamID());
                 currentState = ChipState.Idle;
                 gameObject.tag = "Chip";
             }
@@ -150,7 +150,7 @@ public class Snapping : MonoBehaviour
         rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
         line.gameObject.SetActive(false);
 
-        GameManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
+        GameTourManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
         currentState = ChipState.Moving;
         gameObject.tag = "Player";
     }

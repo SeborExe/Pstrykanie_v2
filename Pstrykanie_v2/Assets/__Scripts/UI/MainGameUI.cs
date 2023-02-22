@@ -10,7 +10,7 @@ public class MainGameUI : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+        GameTourManager.Instance.OnStateChanged += GameManager_OnStateChanged;
 
         RefreshUI();
     }
@@ -22,6 +22,17 @@ public class MainGameUI : MonoBehaviour
 
     private void RefreshUI()
     {
-        currentGameStateText.text = GameManager.Instance.GetCurrentGameState().ToString();
+        if (GameTourManager.Instance.GetCurrentGameState() == GameState.TeamOneTurn || GameTourManager.Instance.GetNextGameState() == GameState.TeamOneTurn)
+        {
+            currentGameStateText.text = "Team 1 Turn";
+        }
+        else if (GameTourManager.Instance.GetCurrentGameState() == GameState.TeamTwoTurn || GameTourManager.Instance.GetNextGameState() == GameState.TeamTwoTurn)
+        {
+            currentGameStateText.text = "Team 2 Turn";
+        }
+        else
+        {
+            currentGameStateText.text = string.Empty;
+        }
     }
 }
