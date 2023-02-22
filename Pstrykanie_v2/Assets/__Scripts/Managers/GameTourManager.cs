@@ -6,6 +6,13 @@ using UnityEngine;
 public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 {
     public event EventHandler OnStateChanged;
+    public event EventHandler OnGameOver;
+    public event EventHandler<OnNextStateChangedArgs> OnNextStateChanged;
+
+    public class OnNextStateChangedArgs : EventArgs
+    {
+        public GameState nextGameState;
+    }
 
     private GameState currentState;
     private GameState previousGameState;
@@ -13,6 +20,7 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 
     private float changingTurnVignetteTimer;
     private float changingTurnVignetteTime = 1f;
+    private int winningTeamID;
 
     private void Start()
     {
@@ -30,8 +38,20 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
                 if (changingTurnVignetteTimer <= 0f)
                 {
                     ChangeGameState(nextGameState);
+                    nextGameState = GameState.None;
                     GameManager.Instance.SetVignete(nextGameState, true);
                 }
+                break;
+        }
+
+        switch (nextGameState)
+        {
+            case GameState.TeamOneTurn:
+            case GameState.TeamTwoTurn:
+                OnNextStateChanged(this, new OnNextStateChangedArgs { nextGameState = nextGameState });
+                break;
+            default:
+                OnNextStateChanged(this, new OnNextStateChangedArgs { nextGameState = GameState.None });
                 break;
         }
     }
@@ -104,15 +124,13 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     {
         if (!GameManager.Instance.CheckIfTeamHasChip(1))
         {
-            //Team Two WIN!
-            Debug.Log("Team TWO WIN!");
+            winningTeamID = 2;
             GameOver();
         }
 
         if (!GameManager.Instance.CheckIfTeamHasChip(2))
         {
-            //Team One WIN!
-            Debug.Log("Team ONE WIN!");
+            winningTeamID = 1;
             GameOver();
         }
     }
@@ -121,6 +139,7 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     {
         currentState = GameState.GameOver;
         OnStateChanged?.Invoke(this, EventArgs.Empty);
+        OnGameOver?.Invoke(this, EventArgs.Empty);
     }
 
     public GameState GetCurrentGameState()
@@ -131,5 +150,10 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     public GameState GetNextGameState()
     {
         return nextGameState;
+    }
+
+    public int GetWinningTeamID()
+    {
+        return winningTeamID;
     }
 }
