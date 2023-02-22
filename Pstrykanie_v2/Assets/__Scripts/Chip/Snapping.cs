@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,13 +6,24 @@ using UnityEngine.EventSystems;
 
 public class Snapping : MonoBehaviour
 {
+    private enum ChipState
+    {
+        Idle, 
+        Moving
+    }
+
+    private Chip chip;
+
     [SerializeField] Transform launchPoint;
-    [SerializeField] LineRenderer line;
+
+    private LineRenderer line;
+    private LineVisual lineVisual;
 
     private float speed;
     private float streatch;
     private float pushPower;
     private float mass;
+    private ChipState currentState = ChipState.Idle;
 
     private bool isMouseDown;
     private Rigidbody rigidBody;
@@ -21,6 +33,10 @@ public class Snapping : MonoBehaviour
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
+        chip = GetComponent<Chip>();
+
+        line = GetComponentInChildren<LineRenderer>();
+        lineVisual = line.GetComponent<LineVisual>();
     }
 
     private void Start()
@@ -35,6 +51,7 @@ public class Snapping : MonoBehaviour
     private void Update()
     {
         CheckForInput();
+        CheckChipState();
     }
 
     private void OnMouseEnter()
@@ -49,13 +66,19 @@ public class Snapping : MonoBehaviour
 
     private void OnMouseDown()
     {
-        isMouseDown = true;
+        if (GameManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        {
+            isMouseDown = true;
+        }
     }
 
     private void OnMouseUp()
     {
-        isMouseDown = false;
-        Snap();
+        if (GameManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        {
+            isMouseDown = false;
+            Snap();
+        }
     }
 
     private void CheckForInput()
@@ -67,13 +90,30 @@ public class Snapping : MonoBehaviour
             line.gameObject.SetActive(true);
 
             currentPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            snapForce = (currentPosition - launchPoint.position) * speed * -1;
-
             SetStrips(currentPosition);
         }
         else
         {
             ResetStrips();
+        }
+    }
+
+        private void CheckChipState()
+    {
+        if (currentState == ChipState.Moving)
+        {
+            if (GameTourManager.Instance.GetCurrentGameState() == GameState.GameOver)
+            {
+                currentState = ChipState.Idle;
+                return;
+            }
+
+            else if (rigidBody.IsSleeping() || !chip.IsPlaying())
+            {
+                GameTourManager.Instance.ChangeGameState(chip.GetChipTeamID());
+                currentState = ChipState.Idle;
+                gameObject.tag = "Chip";
+            }
         }
     }
 
@@ -96,6 +136,11 @@ public class Snapping : MonoBehaviour
 
         Vector3 endPoint = launchPoint.position + direction; // Obliczamy koñcow¹ pozycjê linii
         endPoint.y = 0f; // Ustawiamy Y na 0, aby koñcówka linii by³a na p³aszczyŸnie XZ
+
+        snapForce = (endPoint - launchPoint.position) * speed * -1;
+
+        lineVisual.ChangeLineColor(direction, streatch);
+
         line.SetPosition(0, launchPoint.position);
         line.SetPosition(1, endPoint);
     }
@@ -104,15 +149,19 @@ public class Snapping : MonoBehaviour
     {
         rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
         line.gameObject.SetActive(false);
+
+        GameTourManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
+        currentState = ChipState.Moving;
+        gameObject.tag = "Player";
     }
-  
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Chip" && collision.gameObject.TryGetComponent(out Rigidbody enemyRigidbody))
         {
-            Vector3 direction = collision.transform.position - transform.position;
-            direction = direction.normalized;
-            enemyRigidbody.AddForce(direction * pushPower * rigidBody.velocity.z * mass);
+            Vector3 direction = (collision.transform.position - transform.position).normalized;
+            float pushForce = pushPower * Mathf.Abs(rigidBody.velocity.z) * mass;
+            enemyRigidbody.AddForce(direction * pushForce);
         }
     } 
 
