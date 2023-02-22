@@ -8,8 +8,8 @@ using UnityEngine.Rendering.Universal;
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
     [Header("Chips")]
-    [SerializeField] List<ChipSO> teamOneChips = new List<ChipSO>();
-    [SerializeField] List<ChipSO> teamTwoChips = new List<ChipSO>();
+    List<ChipSO> teamOneChips = new List<ChipSO>();
+    List<ChipSO> teamTwoChips = new List<ChipSO>();
     [SerializeField] List<Transform> teamOneSpawnPositions = new List<Transform>();
     [SerializeField] List<Transform> teamTwoSpawnPositions = new List<Transform>();
     [SerializeField] private Chip ChipPrefab;
@@ -33,8 +33,8 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     private void Start()
     {
-        InitializeTeams();
-
+        GetTeams();
+        
         DeadZone.Instance.OnChipFall += DeadZone_OnChipFall;
     }
 
@@ -50,6 +50,14 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         }
 
         GameTourManager.Instance.CheckForGameOver();
+    }
+
+    private void GetTeams()
+    {
+        teamOneChips = TeamManager.Instance.GetTeamChips(1);
+        teamTwoChips = TeamManager.Instance.GetTeamChips(2);
+
+        InitializeTeams();
     }
 
     private void InitializeTeams()

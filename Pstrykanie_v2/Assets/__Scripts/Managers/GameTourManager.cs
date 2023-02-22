@@ -22,6 +22,11 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     private float changingTurnVignetteTime = 1f;
     private int winningTeamID;
 
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     private void Start()
     {
         RollStartingTeam();
