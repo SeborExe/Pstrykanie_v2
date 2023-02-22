@@ -1,8 +1,9 @@
 using Cinemachine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
@@ -11,6 +12,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         TeamOneTurn,
         TeamTwoTurn,
         Waiting,
+        IsChangingTurn,
         GameOver
     }
 
@@ -19,6 +21,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     private GameState currentState;
     private GameState previousGameState;
 
+    [Header("Chips")]
     [SerializeField] List<ChipSO> teamOneChips = new List<ChipSO>();
     [SerializeField] List<ChipSO> teamTwoChips = new List<ChipSO>();
     [SerializeField] List<Transform> teamOneSpawnPositions = new List<Transform>();
@@ -26,16 +29,24 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     [SerializeField] private Chip ChipPrefab;
     [SerializeField] List<Chip> AllChips = new List<Chip>();
 
+    [Header("Components")]
+    [SerializeField] private Volume volume;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
 
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    private Vignette vignette;
+    private GameState nextTeamTurn;
+    private float changingTurnVignetteTimer;
+    private float changingTurnVignetteTime = 3f;
 
     protected override void Awake()
     {
         base.Awake();
 
         RollStartingTeam();
+        volume.profile.TryGet<Vignette >(out vignette);
     }
 
     private void Start()
@@ -43,6 +54,32 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         InitializeTeams();
 
         DeadZone.Instance.OnChipFall += DeadZone_OnChipFall;
+    }
+
+    private void Update()
+    {
+        UpdateTimers();
+
+        switch (currentState)
+        {
+            case GameState.IsChangingTurn:
+                SetVignete(nextTeamTurn, false);
+                if (changingTurnVignetteTimer <= 0f)
+                {
+                    currentState = nextTeamTurn;
+                    SetVignete(nextTeamTurn, true);
+                    OnStateChanged?.Invoke(this, EventArgs.Empty);
+                }
+                break;
+        }
+    }
+
+    private void UpdateTimers()
+    {
+        if (changingTurnVignetteTimer > 0)
+        {
+            changingTurnVignetteTimer -= Time.deltaTime;
+        }
     }
 
     private void DeadZone_OnChipFall(object sender, DeadZone.OnChipFallArgs args)
@@ -84,11 +121,17 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         int startingTeam = UnityEngine.Random.Range(1, 3);
         if (startingTeam == 1)
         {
-            currentState = GameState.TeamOneTurn;
+            nextTeamTurn = GameState.TeamOneTurn;
+            currentState = GameState.IsChangingTurn;
+            changingTurnVignetteTimer = changingTurnVignetteTime;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
         else
         {
-            currentState = GameState.TeamTwoTurn;
+            nextTeamTurn = GameState.TeamTwoTurn;
+            currentState = GameState.IsChangingTurn;
+            changingTurnVignetteTimer = changingTurnVignetteTime;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -129,13 +172,17 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     {
         if (chipID == 1 && !wait && (chipTeamTwoCount != 0 && chipTeamOneCount != 0))
         {
-            currentState = GameState.TeamTwoTurn;
+            nextTeamTurn = GameState.TeamTwoTurn;
+            currentState = GameState.IsChangingTurn;
             previousGameState = GameState.Waiting;
+            changingTurnVignetteTimer = changingTurnVignetteTime;
         }
         else if (chipID == 2 && !wait && (chipTeamTwoCount != 0 && chipTeamOneCount != 0))
         {
-            currentState = GameState.TeamOneTurn;
+            nextTeamTurn = GameState.TeamOneTurn;
+            currentState = GameState.IsChangingTurn;
             previousGameState = GameState.Waiting;
+            changingTurnVignetteTimer = changingTurnVignetteTime;
         }
         else
         {
@@ -157,5 +204,26 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     {
         CinemachineShake cinemachineShake = virtualCamera.GetComponent<CinemachineShake>();
         cinemachineShake.ShakeCamera(amplitude, frequency, time);
+    }
+
+    private void SetVignete(GameState nextTeamTurn, bool showLowVisibleViggnete)
+    {
+        if (!showLowVisibleViggnete)
+        {
+            vignette.intensity.value = 0.35f;
+        }
+        else
+        {
+            vignette.intensity.value = 0.25f;
+        }
+
+        if (nextTeamTurn == GameState.TeamOneTurn)
+        {
+            vignette.color.value = Color.blue;
+        }
+        else if (nextTeamTurn == GameState.TeamTwoTurn)
+        {
+            vignette.color.value = Color.red;
+        }
     }
 }
