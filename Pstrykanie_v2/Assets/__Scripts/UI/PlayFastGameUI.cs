@@ -11,11 +11,13 @@ public class PlayFastGameUI : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button playButton;
     [SerializeField] private Button selectMapButton;
+    [SerializeField] private Button selectTeamsButton;
     [SerializeField] private Button backToMainMenuButton;
 
     [Header("GameObject")]
     [SerializeField] private GameObject mainMenuGameObject;
     [SerializeField] private GameObject selectMapGameObjectUI;
+    [SerializeField] private GameObject selectTeamsUI;
 
     [Header("Selected Map")]
     [SerializeField] private Image mapPreviewImage;
@@ -34,6 +36,7 @@ public class PlayFastGameUI : MonoBehaviour
         backToMainMenuButton.onClick.AddListener(() => SelectOption(mainMenuGameObject));
         playButton.onClick.AddListener(() => PlayGame());
         selectMapButton.onClick.AddListener(() => SelectOption(selectMapGameObjectUI));
+        selectTeamsButton.onClick.AddListener(() => SelectOption(selectTeamsUI));
     }
 
     private void OnDisable()
@@ -41,6 +44,7 @@ public class PlayFastGameUI : MonoBehaviour
         backToMainMenuButton.onClick.RemoveAllListeners();
         playButton.onClick.RemoveAllListeners();
         selectMapButton.onClick.RemoveAllListeners();
+        selectTeamsButton.onClick.RemoveAllListeners();
     }
 
     private void SelectOption(GameObject option)
