@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SelectMapUI : MonoBehaviour
 {
+    public static event EventHandler OnMapChanged;
+
     [SerializeField] private Transform mapsAnchor;
     [SerializeField] private MapSelectOption mapSelectPrefab;
     [SerializeField] private Button backButton;
@@ -50,5 +53,10 @@ public class SelectMapUI : MonoBehaviour
     {
         option.gameObject.SetActive(true);
         gameObject.SetActive(false);
+    }
+
+    public static void OnMapChangedInvoke(object obj)
+    {
+        OnMapChanged?.Invoke(obj, EventArgs.Empty);
     }
 }

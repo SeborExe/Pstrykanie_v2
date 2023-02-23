@@ -7,25 +7,32 @@ using UnityEngine.UI;
 
 public class MapSelectOption : MonoBehaviour
 {
-    public event EventHandler OnMapChanged;
-
     [SerializeField] TMP_Text mapName;
     private Button mapButton;
     private Image backgroundImage;
     private Image buttonMapImage;
+    private MapSO map;
 
     private void Awake()
     {
         backgroundImage = GetComponent<Image>();
         mapButton = GetComponentInChildren<Button>();
         buttonMapImage = mapButton.GetComponent<Image>();
+
+        SelectMapUI.OnMapChanged += SelectMapUI_OnMapChanged;
+    }
+
+    private void SelectMapUI_OnMapChanged(object sender, EventArgs e)
+    {
+        UpdateUIChanges(map);
     }
 
     private void OnEnable()
     {
         mapButton.onClick.AddListener(() =>
         {
-            OnMapChanged?.Invoke(this, EventArgs.Empty);
+            GameSettings.Instance.SetSelectedMap(map);
+            SelectMapUI.OnMapChangedInvoke(this);
         });
     }
 
@@ -36,9 +43,15 @@ public class MapSelectOption : MonoBehaviour
 
     public void Initialize(MapSO map)
     {
+        this.map = map;
         mapName.text = map.name;
         buttonMapImage.sprite = map.mapIcon;
 
+        UpdateUIChanges(map);
+    }
+
+    private void UpdateUIChanges(MapSO map)
+    {
         if (GameSettings.Instance.GetCurrentSelectedMap().name == map.name)
         {
             backgroundImage.color = Color.green;

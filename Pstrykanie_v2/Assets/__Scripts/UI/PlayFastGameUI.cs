@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,9 +17,16 @@ public class PlayFastGameUI : MonoBehaviour
     [SerializeField] private GameObject mainMenuGameObject;
     [SerializeField] private GameObject selectMapGameObjectUI;
 
+    [Header("Selected Map")]
+    [SerializeField] private Image mapPreviewImage;
+    [SerializeField] private TMP_Text mapText;
+
     private void Start()
     {
+        UpdateMapPreview();
         gameObject.SetActive(false);
+
+        SelectMapUI.OnMapChanged += SelectMapUI_OnMapChanged;
     }
 
     private void OnEnable()
@@ -43,5 +52,16 @@ public class PlayFastGameUI : MonoBehaviour
     private void PlayGame()
     {
         SceneManager.LoadScene(GameSettings.Instance.GetCurrentSelectedMap().mapSceneName);
+    }
+
+    private void UpdateMapPreview()
+    {
+        mapPreviewImage.sprite = GameSettings.Instance.GetCurrentSelectedMap().mapIcon;
+        mapText.text = GameSettings.Instance.GetCurrentSelectedMap().mapName;
+    }
+
+    private void SelectMapUI_OnMapChanged(object sender, EventArgs e)
+    {
+        UpdateMapPreview();
     }
 }

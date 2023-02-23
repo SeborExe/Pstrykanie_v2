@@ -1575,6 +1575,8 @@ MonoBehaviour:
   backToMainMenuButton: {fileID: 1065109301}
   mainMenuGameObject: {fileID: 1041843094}
   selectMapGameObjectUI: {fileID: 658728832}
+  mapPreviewImage: {fileID: 1616114}
+  mapText: {fileID: 1352207110}
 --- !u!1 &645525354
 GameObject:
   m_ObjectHideFlags: 0
@@ -2491,6 +2493,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
   allMaps:
   - {fileID: 11400000, guid: 82d7f54f32451e4409d38bf0a314680b, type: 2}
+  - {fileID: 11400000, guid: f826400ef882b6147b7272455c4ff047, type: 2}
 --- !u!4 &970702596
 Transform:
   m_ObjectHideFlags: 0
@@ -4132,7 +4135,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 150, y: -50}
+  m_AnchoredPosition: {x: 40, y: -50}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1352207110
@@ -4189,7 +4192,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
