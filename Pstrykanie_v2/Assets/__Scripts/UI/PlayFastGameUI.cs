@@ -6,14 +6,14 @@ using UnityEngine.UI;
 
 public class PlayFastGameUI : MonoBehaviour
 {
-    private const string MAP_1 = "Map_1";
-
     [Header("Buttons")]
     [SerializeField] private Button playButton;
+    [SerializeField] private Button selectMapButton;
     [SerializeField] private Button backToMainMenuButton;
 
     [Header("GameObject")]
     [SerializeField] private GameObject mainMenuGameObject;
+    [SerializeField] private GameObject selectMapGameObjectUI;
 
     private void Start()
     {
@@ -23,13 +23,15 @@ public class PlayFastGameUI : MonoBehaviour
     private void OnEnable()
     {
         backToMainMenuButton.onClick.AddListener(() => SelectOption(mainMenuGameObject));
-        playButton.onClick.AddListener(() => PlayGame(MAP_1));
+        playButton.onClick.AddListener(() => PlayGame());
+        selectMapButton.onClick.AddListener(() => SelectOption(selectMapGameObjectUI));
     }
 
     private void OnDisable()
     {
         backToMainMenuButton.onClick.RemoveAllListeners();
         playButton.onClick.RemoveAllListeners();
+        selectMapButton.onClick.RemoveAllListeners();
     }
 
     private void SelectOption(GameObject option)
@@ -38,8 +40,8 @@ public class PlayFastGameUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void PlayGame(string mapName)
+    private void PlayGame()
     {
-        SceneManager.LoadScene(mapName);
+        SceneManager.LoadScene(GameSettings.Instance.GetCurrentSelectedMap().mapSceneName);
     }
 }

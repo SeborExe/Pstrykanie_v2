@@ -54,8 +54,8 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     private void GetTeams()
     {
-        teamOneChips = TeamManager.Instance.GetTeamChips(1);
-        teamTwoChips = TeamManager.Instance.GetTeamChips(2);
+        teamOneChips = GameSettings.Instance.GetTeamChips(1);
+        teamTwoChips = GameSettings.Instance.GetTeamChips(2);
 
         InitializeTeams();
     }
