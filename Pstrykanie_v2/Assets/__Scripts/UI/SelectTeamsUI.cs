@@ -4,13 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SelectTeamsUI : MonoBehaviour
+public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
 {
+    public event EventHandler OnSelectTeamConfirm;
+
     [SerializeField] private Transform chipsContainerArchon;
-    [SerializeField] private ChipSelectObject chipPrefab;
+    [SerializeField] private Transform chipPrefab;
     [SerializeField] private List<ChipSO> allchips = new List<ChipSO>();
     [SerializeField] private Button backButton;
     [SerializeField] private GameObject fastGameUI;
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
 
     private void Start()
     {
@@ -20,7 +27,11 @@ public class SelectTeamsUI : MonoBehaviour
 
     private void OnEnable()
     {
-        backButton.onClick.AddListener(() => SelectOption(fastGameUI));
+        backButton.onClick.AddListener(() =>
+        {
+            OnSelectTeamConfirm?.Invoke(this, EventArgs.Empty);
+            SelectOption(fastGameUI);
+        });
     }
 
     private void OnDisable()
@@ -37,7 +48,8 @@ public class SelectTeamsUI : MonoBehaviour
 
         foreach (ChipSO chip in allchips)
         {
-            ChipSelectObject chipObject = Instantiate(chipPrefab, chipsContainerArchon);
+            Transform chipTransform = Instantiate(chipPrefab, chipsContainerArchon);
+            ChipSelectObject chipObject = chipTransform.GetComponentInChildren<ChipSelectObject>();
             chipObject.Initialize(chip);
         }
     }

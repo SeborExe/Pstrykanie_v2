@@ -7,10 +7,10 @@ public class GameSettings : SingletonMonobehaviour<GameSettings>
 {
     public event EventHandler OnTeamMemberChanged;
 
-    [SerializeField] List<ChipSO> teamOneChips = new List<ChipSO>();
-    [SerializeField] List<ChipSO> teamTwoChips = new List<ChipSO>();
     [SerializeField] List<MapSO> allMaps = new List<MapSO>();
 
+    private List<ChipSO> teamOneChips = new List<ChipSO>();
+    private List<ChipSO> teamTwoChips = new List<ChipSO>();
     private MapSO selectedMap;
 
     protected override void Awake()
@@ -19,6 +19,19 @@ public class GameSettings : SingletonMonobehaviour<GameSettings>
         DontDestroyOnLoad(gameObject);
 
         SetSelectedMap(allMaps[0]);
+    }
+
+    public void SetTeamChips(List<ChipSO> chips, int teamNumber)
+    {
+        if (teamNumber == 1)
+        {
+            teamOneChips = chips;
+        }
+
+        else if (teamNumber == 2)
+        {
+            teamTwoChips = chips;
+        }
     }
 
     public List<ChipSO> GetTeamChips(int teamID)
@@ -36,6 +49,11 @@ public class GameSettings : SingletonMonobehaviour<GameSettings>
         { 
             return null; 
         }
+    }
+
+    public bool TeamsHasEnoughMembers()
+    {
+        return teamOneChips.Count >= 3 && teamTwoChips.Count >= 3;
     }
 
     public List<MapSO> GetAllMaps()

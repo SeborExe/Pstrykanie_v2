@@ -5,10 +5,22 @@ using UnityEngine.UI;
 
 public class ChipSelectObject : MonoBehaviour
 {
-    [SerializeField] private Image chipIcon;
+    private Image chipIcon;
+    private ChipSO chip;
+
+    private void Awake()
+    {
+        chipIcon = GetComponentInChildren<Image>();
+    }
 
     public void Initialize(ChipSO chip)
     {
+        this.chip = chip;
         chipIcon.sprite = chip.Image;
+    }
+
+    public ChipSO GetChipData()
+    {
+        return chip;
     }
 }
