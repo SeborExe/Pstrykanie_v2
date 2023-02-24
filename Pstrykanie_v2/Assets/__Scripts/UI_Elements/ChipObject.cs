@@ -38,4 +38,9 @@ public class ChipObject : MonoBehaviour
     {
         transform.parent.GetComponent<ChipTeamSlot>().ResetChipData();
     }
+
+    public void SetChipData(ChipSO chip)
+    {
+        this.chip = chip;
+    }
 }

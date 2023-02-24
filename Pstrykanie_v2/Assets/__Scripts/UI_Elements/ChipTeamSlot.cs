@@ -27,6 +27,8 @@ public class ChipTeamSlot : MonoBehaviour, IDropHandler
                     chip.BackToPreviousPosition();
                     chipInTeamSlot = chip.GetChipData();
                     ChipObject chipObject = Instantiate(chip, transform);
+                    chipObject.SetChipData(chipInTeamSlot);
+
                     chipObject.GetComponent<RectTransform>().transform.position = GetComponent<RectTransform>().transform.position;
                     chipObject.gameObject.transform.SetParent(this.gameObject.transform);
 
@@ -36,10 +38,12 @@ public class ChipTeamSlot : MonoBehaviour, IDropHandler
                 }
                 else
                 {
-                    eventData.pointerDrag.GetComponent<RectTransform>().transform.position = GetComponent<RectTransform>().transform.position;
                     chip.SetPreviousPositionDataToNull();
-                    chipInTeamSlot = chip.GetChipData();
+                    chip.GetComponent<RectTransform>().transform.position = GetComponent<RectTransform>().transform.position;
                     chip.gameObject.transform.SetParent(this.gameObject.transform);
+                    chipInTeamSlot = chip.GetChipData();
+
+                    chipInTeamSlot = transform.GetComponentInChildren<ChipObject>().GetChipData();
                 }
             }
         }

@@ -3265,10 +3265,11 @@ MonoBehaviour:
   allchips:
   - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
   - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
-  - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
-  - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
-  - {fileID: 11400000, guid: bc9028aea9e10aa49b9080a44467f43c, type: 2}
-  - {fileID: 11400000, guid: 0b74b78176a83654e8a82de5f34dc680, type: 2}
+  - {fileID: 11400000, guid: 3f060d08785c698458ad1698898adfdc, type: 2}
+  - {fileID: 11400000, guid: eca31b0475e218042b8d0438b0017c9f, type: 2}
+  - {fileID: 11400000, guid: 11c119da3113c5d49953e13fc95e0cf7, type: 2}
+  - {fileID: 11400000, guid: 590bd92720ff02847ad5ce1fb7da7009, type: 2}
+  - {fileID: 11400000, guid: d292b41ba443da840a15a790b7cb7b56, type: 2}
   backButton: {fileID: 698708892}
   fastGameUI: {fileID: 583930782}
 --- !u!224 &895109678 stripped

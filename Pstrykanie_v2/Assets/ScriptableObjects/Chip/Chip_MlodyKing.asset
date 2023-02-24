@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3139151e5127e14bba7be5441013454, type: 3}
+  m_Name: Chip_MlodyKing
+  m_EditorClassIdentifier: 
+  Image: {fileID: 21300000, guid: cd49775da76419d4c99cb50a979a9e7f, type: 3}
+  isMetal: 0
+  size: {x: 3, y: 1, z: 3}
+  speed: 1500
+  maxStretch: 30
+  pushPower: 60
+  mass: 12
+  physicMaterial: {fileID: 13400000, guid: 99389f7964ae3ac4d8a92ccf57cb3dbe, type: 2}
