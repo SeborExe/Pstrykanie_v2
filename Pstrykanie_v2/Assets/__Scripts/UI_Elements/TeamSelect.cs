@@ -10,6 +10,7 @@ public class TeamSelect : MonoBehaviour
 
     private void Start()
     {
+        AddTeams();
         SelectTeamsUI.Instance.OnSelectTeamConfirm += SelectTeamsUI_OnSelectTeamConfirm;
     }
 
@@ -21,8 +22,12 @@ public class TeamSelect : MonoBehaviour
     private void AddTeams()
     {
         List<ChipSO> teamMembers = new List<ChipSO>();
+        teamMembers.Clear();
+
         foreach (ChipTeamSlot chip in slots)
         {
+            if (chip.GetChipInTeamSlot() == null) continue;
+
             teamMembers.Add(chip.GetChipInTeamSlot());
         }
 

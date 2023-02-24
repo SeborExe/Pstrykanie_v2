@@ -29,6 +29,22 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
+
+        Physics.Raycast(transform.position, Vector3.left, out RaycastHit hit);
+
+        if (hit.collider == null)
+        {
+            ChipObject chipObject = GetComponent<ChipObject>();
+            if (chipObject.PreviousPositionIsChipTeamSlot())
+            {
+                chipObject.SetPreviousPositionDataToNull();
+                Destroy(gameObject);
+            }
+            else
+            {
+                chipObject.BackToPreviousPosition();
+            }
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)

@@ -7,9 +7,11 @@ using UnityEngine.UI;
 public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
 {
     public event EventHandler OnSelectTeamConfirm;
+    public event EventHandler OnViewUpdate;
 
     [SerializeField] private Transform chipsContainerArchon;
     [SerializeField] private Transform chipPrefab;
+    [SerializeField] private Transform slotPrefab;
     [SerializeField] private List<ChipSO> allchips = new List<ChipSO>();
     [SerializeField] private Button backButton;
     [SerializeField] private GameObject fastGameUI;
@@ -30,6 +32,7 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
         backButton.onClick.AddListener(() =>
         {
             OnSelectTeamConfirm?.Invoke(this, EventArgs.Empty);
+            OnViewUpdate?.Invoke(this, EventArgs.Empty);
             SelectOption(fastGameUI);
         });
     }
@@ -48,8 +51,12 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
 
         foreach (ChipSO chip in allchips)
         {
-            Transform chipTransform = Instantiate(chipPrefab, chipsContainerArchon);
-            ChipSelectObject chipObject = chipTransform.GetComponentInChildren<ChipSelectObject>();
+            Transform slotTransform = Instantiate(slotPrefab, chipsContainerArchon);
+            Transform chipTransform = Instantiate(chipPrefab, slotTransform);
+
+            chipTransform.GetComponent<RectTransform>().transform.position = slotTransform.GetComponent<RectTransform>().transform.position;
+            
+            ChipObject chipObject = chipTransform.GetComponentInChildren<ChipObject>();
             chipObject.Initialize(chip);
         }
     }

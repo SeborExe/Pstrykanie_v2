@@ -25,12 +25,20 @@ public class GameSettings : SingletonMonobehaviour<GameSettings>
     {
         if (teamNumber == 1)
         {
-            teamOneChips = chips;
+            teamOneChips.Clear();
+            foreach (ChipSO chip in chips) 
+            { 
+                teamOneChips.Add(chip);
+            }
         }
 
         else if (teamNumber == 2)
         {
-            teamTwoChips = chips;
+            teamTwoChips.Clear();
+            foreach (ChipSO chip in chips)
+            {
+                teamTwoChips.Add(chip);
+            }
         }
     }
 

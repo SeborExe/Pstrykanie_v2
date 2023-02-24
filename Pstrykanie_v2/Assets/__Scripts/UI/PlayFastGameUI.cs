@@ -36,10 +36,10 @@ public class PlayFastGameUI : MonoBehaviour
         UpdateTeamsView();
 
         SelectMapUI.OnMapChanged += SelectMapUI_OnMapChanged;
-        SelectTeamsUI.Instance.OnSelectTeamConfirm += SelectTeamsUI_OnSelectTeamConfirm;
+        SelectTeamsUI.Instance.OnViewUpdate += SelectTeamsUI_OnViewUpdate;
     }
 
-    private void SelectTeamsUI_OnSelectTeamConfirm(object sender, EventArgs e)
+    private void SelectTeamsUI_OnViewUpdate(object sender, EventArgs e)
     {
         ChanePlayButtonState();
         UpdateTeamsView();
@@ -99,26 +99,43 @@ public class PlayFastGameUI : MonoBehaviour
 
     private void UpdateTeamsView()
     {
-        for (int i = 0; i < teamOne.Length; i++)
+        UpdateChipsView(teamOne, 1);
+        UpdateChipsView(teamTwo, 2);
+    }
+
+    private void UpdateChipsView(Image[] imagesArray, int teamNumber)
+    {
+        for (int i = 0; i < imagesArray.Length; i++)
         {
-            if (GameSettings.Instance.GetTeamChips(1).Count != 0)
+            if (GameSettings.Instance.GetTeamChips(teamNumber).Count == 0)
             {
-                teamOne[i].sprite = GameSettings.Instance.GetTeamChips(1)[i].Image;
+                imagesArray[0].color = Color.black;
+                imagesArray[1].color = Color.black;
+                imagesArray[2].color = Color.black;
             }
-            else
+            else if (GameSettings.Instance.GetTeamChips(teamNumber).Count == 1)
             {
-                teamOne[i].sprite = null;
+                imagesArray[0].sprite = GameSettings.Instance.GetTeamChips(teamNumber)[0].Image;
+                imagesArray[0].color = Color.white;
+                imagesArray[1].color = Color.black;
+                imagesArray[2].color = Color.black;
             }
-        }
-        for (int i = 0; i < teamTwo.Length; i++)
-        {
-            if (GameSettings.Instance.GetTeamChips(2).Count != 0)
+            else if (GameSettings.Instance.GetTeamChips(teamNumber).Count == 2)
             {
-                teamTwo[i].sprite = GameSettings.Instance.GetTeamChips(2)[i].Image;
+                imagesArray[0].sprite = GameSettings.Instance.GetTeamChips(teamNumber)[0].Image;
+                imagesArray[1].sprite = GameSettings.Instance.GetTeamChips(teamNumber)[1].Image;
+                imagesArray[0].color = Color.white;
+                imagesArray[1].color = Color.white;
+                imagesArray[2].color = Color.black;
             }
-            else
+            else if (GameSettings.Instance.GetTeamChips(teamNumber).Count == 3)
             {
-                teamTwo[i].sprite = null;
+                imagesArray[0].sprite = GameSettings.Instance.GetTeamChips(teamNumber)[0].Image;
+                imagesArray[1].sprite = GameSettings.Instance.GetTeamChips(teamNumber)[1].Image;
+                imagesArray[2].sprite = GameSettings.Instance.GetTeamChips(teamNumber)[2].Image;
+                imagesArray[0].color = Color.white;
+                imagesArray[1].color = Color.white;
+                imagesArray[2].color = Color.white;
             }
         }
     }
