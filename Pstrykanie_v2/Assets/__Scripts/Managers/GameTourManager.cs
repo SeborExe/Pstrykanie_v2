@@ -18,8 +18,6 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     private GameState previousGameState;
     private GameState nextGameState;
 
-    private float changingTurnVignetteTimer;
-    private float changingTurnVignetteTime = 1f;
     private int winningTeamID;
 
     protected override void Awake()
@@ -34,21 +32,6 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 
     private void Update()
     {
-        UpdateTimers();
-
-        switch (currentState)
-        {
-            case GameState.IsChangingTurn:
-                GameManager.Instance.SetVignete(nextGameState, false);
-                if (changingTurnVignetteTimer <= 0f)
-                {
-                    ChangeGameState(nextGameState);
-                    nextGameState = GameState.None;
-                    GameManager.Instance.SetVignete(nextGameState, true);
-                }
-                break;
-        }
-
         switch (nextGameState)
         {
             case GameState.TeamOneTurn:
@@ -61,18 +44,10 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         }
     }
 
-    private void UpdateTimers()
-    {
-        if (changingTurnVignetteTimer > 0)
-        {
-            changingTurnVignetteTimer -= Time.deltaTime;
-        }
-    }
-
     private void ChangingTurn()
     {
         currentState = GameState.IsChangingTurn;
-        changingTurnVignetteTimer = changingTurnVignetteTime;
+        TourVisual.Instance.ChangeVigneteTimer();
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -145,6 +120,21 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         currentState = GameState.GameOver;
         OnStateChanged?.Invoke(this, EventArgs.Empty);
         OnGameOver?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void SetStateAfterVignette()
+    {
+        ChangeGameState(nextGameState);
+        nextGameState = GameState.None;
+    }
+
+    public int GetCurrentGameStateTeamNumber()
+    {
+        if (GetCurrentGameState() == GameState.TeamOneTurn) return 1;
+
+        if (GetCurrentGameState() == GameState.TeamTwoTurn) return 2;
+
+        else return 0;
     }
 
     public GameState GetCurrentGameState()

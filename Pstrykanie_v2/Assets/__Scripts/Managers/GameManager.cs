@@ -13,22 +13,16 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     [SerializeField] List<Transform> teamOneSpawnPositions = new List<Transform>();
     [SerializeField] List<Transform> teamTwoSpawnPositions = new List<Transform>();
     [SerializeField] private Chip ChipPrefab;
-    [SerializeField] List<Chip> AllChips = new List<Chip>();
 
     [Header("Components")]
-    [SerializeField] private Volume volume;
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
 
-    private Vignette vignette;
-
     protected override void Awake()
     {
         base.Awake();
-
-        volume.profile.TryGet<Vignette >(out vignette);
     }
 
     private void Start()
@@ -66,54 +60,22 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         {
             Chip chip = Instantiate(ChipPrefab, teamOneSpawnPositions[i].position, Quaternion.identity);
             chip.InitializeChip(teamOneChips[i], 1);
-            AllChips.Add(chip);
         }
 
         for (int i = 0; i < teamTwoChips.Count; i++)
         {
             Chip chip = Instantiate(ChipPrefab, teamTwoSpawnPositions[i].position, Quaternion.identity);
             chip.InitializeChip(teamTwoChips[i], 2);
-            AllChips.Add(chip);
         }
 
         chipTeamOneCount = teamOneChips.Count;
         chipTeamTwoCount = teamTwoChips.Count;
     }
 
-    public int GetCurrentGameStateTeamNumber()
-    {
-        if (GameTourManager.Instance.GetCurrentGameState() == GameState.TeamOneTurn) return 1;
-
-        if (GameTourManager.Instance.GetCurrentGameState() == GameState.TeamTwoTurn) return 2;
-
-        else return 0;
-    }
-
     public void ShakeCamera(float amplitude, float frequency, float time)
     {
         CinemachineShake cinemachineShake = virtualCamera.GetComponent<CinemachineShake>();
         cinemachineShake.ShakeCamera(amplitude, frequency, time);
-    }
-
-    public void SetVignete(GameState nextTeamTurn, bool showLowVisibleViggnete)
-    {
-        if (!showLowVisibleViggnete)
-        {
-            vignette.intensity.value = 0.35f;
-        }
-        else
-        {
-            vignette.intensity.value = 0.25f;
-        }
-
-        if (nextTeamTurn == GameState.TeamOneTurn)
-        {
-            vignette.color.value = Color.blue;
-        }
-        else if (nextTeamTurn == GameState.TeamTwoTurn)
-        {
-            vignette.color.value = Color.red;
-        }
     }
 
     public bool CheckIfAnyTeamHasChip()

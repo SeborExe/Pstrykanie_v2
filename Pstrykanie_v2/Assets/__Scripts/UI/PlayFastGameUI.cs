@@ -39,12 +39,6 @@ public class PlayFastGameUI : MonoBehaviour
         SelectTeamsUI.Instance.OnViewUpdate += SelectTeamsUI_OnViewUpdate;
     }
 
-    private void SelectTeamsUI_OnViewUpdate(object sender, EventArgs e)
-    {
-        ChanePlayButtonState();
-        UpdateTeamsView();
-    }
-
     private void OnEnable()
     {
         backToMainMenuButton.onClick.AddListener(() => SelectOption(mainMenuGameObject));
@@ -76,6 +70,12 @@ public class PlayFastGameUI : MonoBehaviour
     {
         mapPreviewImage.sprite = GameSettings.Instance.GetCurrentSelectedMap().mapIcon;
         mapText.text = GameSettings.Instance.GetCurrentSelectedMap().mapName;
+    }
+
+    private void SelectTeamsUI_OnViewUpdate(object sender, EventArgs e)
+    {
+        ChanePlayButtonState();
+        UpdateTeamsView();
     }
 
     private void SelectMapUI_OnMapChanged(object sender, EventArgs e)

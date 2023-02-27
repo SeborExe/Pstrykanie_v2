@@ -66,7 +66,7 @@ public class Snapping : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (GameManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        if (GameTourManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
         {
             isMouseDown = true;
         }
@@ -74,7 +74,7 @@ public class Snapping : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (GameManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        if (GameTourManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
         {
             isMouseDown = false;
             Snap();
