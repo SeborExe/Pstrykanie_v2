@@ -64,6 +64,20 @@ public class GameSettings : SingletonMonobehaviour<GameSettings>
         return teamOneChips.Count >= 3 && teamTwoChips.Count >= 3;
     }
 
+    public bool TeamHasEnoughMembers(int teamID)
+    {
+        if (teamID == 1)
+        {
+            return teamOneChips.Count >= 3;
+        }
+        else if (teamID == 2)
+        {
+            return teamTwoChips.Count >= 3;
+        }
+
+        else return false;
+    }
+
     public List<MapSO> GetAllMaps()
     {
         return allMaps;

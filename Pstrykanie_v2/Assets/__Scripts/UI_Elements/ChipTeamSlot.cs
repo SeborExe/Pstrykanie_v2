@@ -6,6 +6,9 @@ using UnityEngine.EventSystems;
 public class ChipTeamSlot : MonoBehaviour, IDropHandler
 {
     private ChipSO chipInTeamSlot;
+    private ChipObject chipObject;
+
+    [SerializeField] ChipObject chipObjectPrefab;
 
     private void Start()
     {
@@ -26,7 +29,7 @@ public class ChipTeamSlot : MonoBehaviour, IDropHandler
                 {
                     chip.BackToPreviousPosition();
                     chipInTeamSlot = chip.GetChipData();
-                    ChipObject chipObject = Instantiate(chip, transform);
+                    chipObject = Instantiate(chip, transform);
                     chipObject.SetChipData(chipInTeamSlot);
 
                     chipObject.GetComponent<RectTransform>().transform.position = GetComponent<RectTransform>().transform.position;
@@ -65,5 +68,24 @@ public class ChipTeamSlot : MonoBehaviour, IDropHandler
     public ChipSO GetChipInTeamSlot()
     {
         return chipInTeamSlot;
+    }
+
+    public void SetChipData(ChipSO chip)
+    {
+        if (chipObject != null)
+        {
+            Destroy(chipObject.gameObject);
+        }
+
+        chipInTeamSlot = chip;
+        chipObject = Instantiate(chipObjectPrefab, transform);
+        chipObject.SetChipData(chipInTeamSlot);
+
+        chipObject.GetComponent<RectTransform>().transform.position = GetComponent<RectTransform>().transform.position;
+        chipObject.gameObject.transform.SetParent(this.gameObject.transform);
+
+        CanvasGroup canvasGroup = chipObject.gameObject.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f;
+        canvasGroup.blocksRaycasts = true;
     }
 }

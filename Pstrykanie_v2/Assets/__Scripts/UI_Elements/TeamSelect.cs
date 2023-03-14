@@ -33,4 +33,19 @@ public class TeamSelect : MonoBehaviour
 
         GameSettings.Instance.SetTeamChips(teamMembers, teamNumber);
     }
+
+    public List<ChipTeamSlot> GetTeam()
+    {
+        return slots;
+    }
+
+    public void SetTeamFromSaved(List<ChipSO> team)
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            slots[0].SetChipData(team[0]);
+            slots[1].SetChipData(team[1]);
+            slots[2].SetChipData(team[2]);
+        }
+    }
 }

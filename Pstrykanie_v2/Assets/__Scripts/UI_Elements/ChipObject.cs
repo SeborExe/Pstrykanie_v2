@@ -42,5 +42,6 @@ public class ChipObject : MonoBehaviour
     public void SetChipData(ChipSO chip)
     {
         this.chip = chip;
+        Initialize(chip);
     }
 }
