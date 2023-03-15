@@ -27,6 +27,9 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
     [SerializeField] private TeamSelect teamSelectOne;
     [SerializeField] private TeamSelect teamSelectTwo;
 
+    [SerializeField] private CreateTeamPopUp createTeamPopUp;
+    [field: SerializeField] public DeleteTeamPopUp deleteTeamPopUp { get; private set; }
+
     private List<Team> teams = new List<Team>();
     private const string fileName = "/saveFile.json";
 
@@ -50,7 +53,7 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
             OnSelectTeamConfirm?.Invoke(this, EventArgs.Empty);
             OnViewUpdate?.Invoke(this, EventArgs.Empty);
             SelectOption(fastGameUI);
-            //InitializeSavedTeams();
+            InitializeSavedTeams();
         });
 
         saveTeam_1_Button.onClick.AddListener(() => 
@@ -130,11 +133,19 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
             }
         }
 
-        Team team = new Team(teamMembers);
+        CreateTeamPopUp popUp = Instantiate(createTeamPopUp, transform.position + new Vector3(0, -700, 0), Quaternion.identity);
+        popUp.transform.SetParent(transform);
+        popUp.Initialize(teamMembers);
+    }
+
+    public void AddToTeamsList(Team team)
+    {
         teams.Add(team);
+    }
 
+    public void SaveNewTeam()
+    {
         FileHandler.SaveToJSON<Team>(teams, "saveFile.json");
-
         InitializeSavedTeams();
     }
 
@@ -166,5 +177,12 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
         }
 
         else return;
+    }
+
+    public void RemoveTeam(Team team)
+    {
+        teams.Remove(team);
+        FileHandler.SaveToJSON<Team>(teams, "saveFile.json");
+        InitializeSavedTeams();
     }
 }
