@@ -27,9 +27,14 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
     [SerializeField] private TeamSelect teamSelectOne;
     [SerializeField] private TeamSelect teamSelectTwo;
 
+    private List<Team> teams = new List<Team>();
+    private const string fileName = "/saveFile.json";
+
     protected override void Awake()
     {
         base.Awake();
+
+        teams = FileHandler.ReadFromJSON<Team>(fileName);
     }
 
     private void Start()
@@ -45,7 +50,7 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
             OnSelectTeamConfirm?.Invoke(this, EventArgs.Empty);
             OnViewUpdate?.Invoke(this, EventArgs.Empty);
             SelectOption(fastGameUI);
-            InitializeSavedTeams();
+            //InitializeSavedTeams();
         });
 
         saveTeam_1_Button.onClick.AddListener(() => 
@@ -86,11 +91,7 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
             chipObject.Initialize(chip);
         }
 
-        //if (PlayerPrefs.HasKey("Teams"))
-        if (File.Exists(Application.dataPath + "/saveFile.json"))
-        {
-            InitializeSavedTeams();
-        }
+        InitializeSavedTeams();
     }
 
     private void SelectOption(GameObject option)
@@ -129,19 +130,10 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
             }
         }
 
-        TeamSO team = new TeamSO(teamMembers);
+        Team team = new Team(teamMembers);
+        teams.Add(team);
 
-        if (File.Exists(Application.dataPath + "/saveFile.json"))
-        {
-            string json = File.ReadAllText(Application.dataPath + "/saveFile.json");
-            json += JsonUtility.ToJson(team);
-            File.WriteAllText(Application.dataPath + "/saveFile.json", json);
-        }
-        else
-        {
-            string json = JsonUtility.ToJson(team);
-            File.WriteAllText(Application.dataPath + "/saveFile.json", json);
-        }
+        FileHandler.SaveToJSON<Team>(teams, "saveFile.json");
 
         InitializeSavedTeams();
     }
@@ -153,23 +145,12 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
             Destroy(child.gameObject);
         }
 
-        /*
-        string json = File.ReadAllText(Application.dataPath + "/saveFile.json");
-        List<TeamSO> teams = JsonUtility.FromJson<List<TeamSO>>(json);
-
-        foreach (TeamSO team in teams)
+        foreach (Team team in teams)
         {
             TeamObject teamObject = Instantiate(teamObjectPrefab, savedTeamsContainerArchon);
             teamObject.SetTeam(team);
         }
-        */
-
-        
-        string json = File.ReadAllText(Application.dataPath + "/saveFile.json");
-        TeamSO team = JsonUtility.FromJson<TeamSO>(json);
-
-        TeamObject teamObject = Instantiate(teamObjectPrefab, savedTeamsContainerArchon);
-        teamObject.SetTeam(team);      
+           
     }
 
     public void LoadTeamFromSaved(int teamID, List<ChipSO> team)

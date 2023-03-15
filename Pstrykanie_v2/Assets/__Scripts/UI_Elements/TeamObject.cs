@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class TeamObject : MonoBehaviour
 {
-    private TeamSO team;
+    private Team team;
 
     [SerializeField] private Button team_1_Button;
     [SerializeField] private Button team_2_Button;
@@ -26,7 +26,7 @@ public class TeamObject : MonoBehaviour
         team_2_Button.onClick.RemoveAllListeners();
     }
 
-    public void SetTeam(TeamSO team)
+    public void SetTeam(Team team)
     {
         this.team = team;
         InitializeTeam();

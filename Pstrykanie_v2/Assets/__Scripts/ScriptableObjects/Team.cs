@@ -1,12 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TeamSO
+[Serializable]
+public class Team
 {
     public List<ChipSO> TeamMembers = new List<ChipSO>();
 
-    public TeamSO(List<ChipSO> teamMembers)
+    public Team(List<ChipSO> teamMembers)
     {
         TeamMembers = teamMembers;
     }
