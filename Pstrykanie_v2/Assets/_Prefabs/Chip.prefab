@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5113050287770453142}
   - component: {fileID: 5113050287770453143}
   - component: {fileID: 5113050287770453164}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Chip
   m_TagString: Chip
   m_Icon: {fileID: 0}
@@ -168,7 +168,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5113050288150565564}
   - component: {fileID: 5113050288150565567}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LunchPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 5113050288953282743}
   - component: {fileID: 5113050288953282742}
   - component: {fileID: 8414944522615663872}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Line
   m_TagString: Untagged
   m_Icon: {fileID: 0}

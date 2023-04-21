@@ -3154,7 +3154,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PSTRYKANIE
+  m_text: SNAP
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 812186a951bab5c4c877025d00aa8e8d, type: 2}
@@ -3558,6 +3558,10 @@ MonoBehaviour:
     type: 3}
   teamSelectOne: {fileID: 1691192932}
   teamSelectTwo: {fileID: 1309157489}
+  createTeamPopUp: {fileID: 6341978671460531257, guid: 757c73d822e510a4c807e8a41fddab3b,
+    type: 3}
+  <deleteTeamPopUp>k__BackingField: {fileID: 5288900543222155762, guid: cf3d6f1c2f721894fb631a00f0b45bf2,
+    type: 3}
 --- !u!224 &895109678 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2160714279315509019, guid: dc0eb37d9c4c0f646bc3a99355aeffa9,

@@ -9,6 +9,13 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     public event EventHandler OnGameOver;
     public event EventHandler<OnNextStateChangedArgs> OnNextStateChanged;
 
+    private GameManager gameManager;
+
+    [SerializeField] LayerMask whatIsSpawnPointTeamOne;
+    [SerializeField] LayerMask whatIsSpawnPointTeamTwo;
+    [SerializeField] LayerMask whatIsChip;
+    [SerializeField] GameObject cube;
+
     public class OnNextStateChangedArgs : EventArgs
     {
         public GameState nextGameState;
@@ -19,6 +26,7 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     private GameState nextGameState;
 
     private int winningTeamID;
+    private bool placingComplete;
 
     protected override void Awake()
     {
@@ -27,7 +35,7 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 
     private void Start()
     {
-        RollStartingTeam();
+        gameManager = GameManager.Instance;
     }
 
     private void Update()
@@ -42,6 +50,74 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
                 OnNextStateChanged(this, new OnNextStateChangedArgs { nextGameState = GameState.None });
                 break;
         }
+
+        switch (currentState)
+        {
+            case GameState.PlacingChipsByTeamOne:
+                if (TryPlanceChip(1) && !placingComplete)
+                {
+                    nextGameState = GameState.PlacingChipsByTeamTwo;
+                    ChangingTurn();
+                }
+                break;
+            case GameState.PlacingChipsByTeamTwo:
+                if (TryPlanceChip(2) && !placingComplete)
+                {
+                    nextGameState = GameState.PlacingChipsByTeamOne;
+                    ChangingTurn();
+                }
+                break;
+            default:
+                break;
+        }
+
+        /*
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 100, whatIsSpawnPoint))
+            {
+                Instantiate(cube, hit.point, Quaternion.identity);
+            }
+        }
+        */
+    }
+
+    private bool TryPlanceChip(int team)
+    {
+        if (team == 1)
+        {
+            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamOne, GameState.TeamTwoTurn);
+        }
+        else
+        {
+            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamTwo, GameState.TeamOneTurn);
+        }
+    }
+
+    private bool HandleRaycastOnPlacingChips(LayerMask layerMaskToPlaceChip, GameState nextGameStateToSetIfAllChipsOnBoard)
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMaskToPlaceChip))
+            {
+                Instantiate(cube, hit.point, Quaternion.identity);
+                gameManager.DecreaseRemainingsChipToPlace();
+
+                if (gameManager.ChipsToPlaceRemains == 0)
+                {
+                    placingComplete = true;
+                    nextGameState = nextGameStateToSetIfAllChipsOnBoard;
+                    ChangingTurn();
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void ChangingTurn()
@@ -51,17 +127,17 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void RollStartingTeam()
+    public void RollStartingTeam()
     {
         int startingTeam = UnityEngine.Random.Range(1, 3);
         if (startingTeam == 1)
         {
-            nextGameState = GameState.TeamOneTurn;
+            nextGameState = GameState.PlacingChipsByTeamOne;
             ChangingTurn();
         }
         else
         {
-            nextGameState = GameState.TeamTwoTurn;
+            nextGameState = GameState.PlacingChipsByTeamTwo;
             ChangingTurn();
         }
     }

@@ -7,6 +7,8 @@ using UnityEngine.Rendering.Universal;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
+    GameTourManager gameTourManager;
+
     [Header("Chips")]
     List<ChipSO> teamOneChips = new List<ChipSO>();
     List<ChipSO> teamTwoChips = new List<ChipSO>();
@@ -20,6 +22,8 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
 
+    public int ChipsToPlaceRemains { get; private set; }
+
     protected override void Awake()
     {
         base.Awake();
@@ -27,23 +31,11 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     private void Start()
     {
+        gameTourManager = GameTourManager.Instance;
+
         GetTeams();
         
         DeadZone.Instance.OnChipFall += DeadZone_OnChipFall;
-    }
-
-    private void DeadZone_OnChipFall(object sender, DeadZone.OnChipFallArgs args)
-    {
-        if (args.chipTeamID == 1)
-        {
-            chipTeamOneCount--;
-        }
-        else
-        {
-            chipTeamTwoCount--;
-        }
-
-        GameTourManager.Instance.CheckForGameOver();
     }
 
     private void GetTeams()
@@ -51,7 +43,10 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         teamOneChips = GameSettings.Instance.GetTeamChips(1);
         teamTwoChips = GameSettings.Instance.GetTeamChips(2);
 
-        InitializeTeams();
+        ChipsToPlaceRemains = teamOneChips.Count + teamTwoChips.Count;
+
+        gameTourManager.RollStartingTeam();
+        //InitializeTeams();
     }
 
     private void InitializeTeams()
@@ -72,6 +67,20 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         chipTeamTwoCount = teamTwoChips.Count;
     }
 
+    private void DeadZone_OnChipFall(object sender, DeadZone.OnChipFallArgs args)
+    {
+        if (args.chipTeamID == 1)
+        {
+            chipTeamOneCount--;
+        }
+        else
+        {
+            chipTeamTwoCount--;
+        }
+
+        GameTourManager.Instance.CheckForGameOver();
+    }
+
     public void ShakeCamera(float amplitude, float frequency, float time)
     {
         CinemachineShake cinemachineShake = virtualCamera.GetComponent<CinemachineShake>();
@@ -88,5 +97,10 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         if (teamNumber == 1) return chipTeamOneCount != 0;
         if (teamNumber == 2) return chipTeamTwoCount != 0;
         else return false;
+    }
+
+    public void DecreaseRemainingsChipToPlace()
+    {
+        ChipsToPlaceRemains--;
     }
 }
