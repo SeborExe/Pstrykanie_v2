@@ -7,14 +7,18 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 {
     public event EventHandler OnStateChanged;
     public event EventHandler OnGameOver;
+    public event EventHandler OnPlacingChipEnded;
     public event EventHandler<OnNextStateChangedArgs> OnNextStateChanged;
 
     private GameManager gameManager;
 
+    [Header("Layer Masks")]
     [SerializeField] LayerMask whatIsSpawnPointTeamOne;
     [SerializeField] LayerMask whatIsSpawnPointTeamTwo;
     [SerializeField] LayerMask whatIsChip;
-    [SerializeField] GameObject cube;
+    [Header("Teams Location")]
+    [SerializeField] MeshRenderer teamBlueMeshRenderer;
+    [SerializeField] MeshRenderer teamRedMeshRenderer;
 
     public class OnNextStateChangedArgs : EventArgs
     {
@@ -56,6 +60,8 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
             case GameState.PlacingChipsByTeamOne:
                 if (TryPlanceChip(1) && !placingComplete)
                 {
+                    teamBlueMeshRenderer.enabled = false;
+                    teamRedMeshRenderer.enabled = true;
                     nextGameState = GameState.PlacingChipsByTeamTwo;
                     ChangingTurn();
                 }
@@ -63,6 +69,8 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
             case GameState.PlacingChipsByTeamTwo:
                 if (TryPlanceChip(2) && !placingComplete)
                 {
+                    teamBlueMeshRenderer.enabled = true;
+                    teamRedMeshRenderer.enabled = false;
                     nextGameState = GameState.PlacingChipsByTeamOne;
                     ChangingTurn();
                 }
@@ -70,44 +78,40 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
             default:
                 break;
         }
-
-        /*
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100, whatIsSpawnPoint))
-            {
-                Instantiate(cube, hit.point, Quaternion.identity);
-            }
-        }
-        */
     }
 
     private bool TryPlanceChip(int team)
     {
         if (team == 1)
         {
-            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamOne, GameState.TeamTwoTurn);
+            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamOne, GameState.TeamTwoTurn, team);
         }
         else
         {
-            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamTwo, GameState.TeamOneTurn);
+            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamTwo, GameState.TeamOneTurn, team);
         }
     }
 
-    private bool HandleRaycastOnPlacingChips(LayerMask layerMaskToPlaceChip, GameState nextGameStateToSetIfAllChipsOnBoard)
+    private bool HandleRaycastOnPlacingChips(LayerMask layerMaskToPlaceChip, GameState nextGameStateToSetIfAllChipsOnBoard, int team)
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMaskToPlaceChip))
             {
-                Instantiate(cube, hit.point, Quaternion.identity);
-                gameManager.DecreaseRemainingsChipToPlace();
+                gameManager.InitializeChip(hit.point, team);
+                gameManager.DecreaseRemainingsChipToPlace(team);
 
-                if (gameManager.ChipsToPlaceRemains == 0)
+                if (gameManager.TeamOneChipToPlaceRemains == 0 && gameManager.TeamTwoChipToPlaceRemains == 0)
                 {
                     placingComplete = true;
+                    gameManager.SetTeamCount();
+
+                    teamBlueMeshRenderer.enabled = false;
+                    teamRedMeshRenderer.enabled = false;
+
+                    OnPlacingChipEnded?.Invoke(this, EventArgs.Empty);
+
                     nextGameState = nextGameStateToSetIfAllChipsOnBoard;
                     ChangingTurn();
                     return false;
@@ -132,11 +136,13 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         int startingTeam = UnityEngine.Random.Range(1, 3);
         if (startingTeam == 1)
         {
+            teamBlueMeshRenderer.enabled = true;
             nextGameState = GameState.PlacingChipsByTeamOne;
             ChangingTurn();
         }
         else
         {
+            teamRedMeshRenderer.enabled = true;
             nextGameState = GameState.PlacingChipsByTeamTwo;
             ChangingTurn();
         }

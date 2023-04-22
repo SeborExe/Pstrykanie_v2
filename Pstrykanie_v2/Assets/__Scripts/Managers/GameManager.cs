@@ -10,11 +10,9 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     GameTourManager gameTourManager;
 
     [Header("Chips")]
+    [SerializeField] private Chip ChipPrefab;
     List<ChipSO> teamOneChips = new List<ChipSO>();
     List<ChipSO> teamTwoChips = new List<ChipSO>();
-    [SerializeField] List<Transform> teamOneSpawnPositions = new List<Transform>();
-    [SerializeField] List<Transform> teamTwoSpawnPositions = new List<Transform>();
-    [SerializeField] private Chip ChipPrefab;
 
     [Header("Components")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
@@ -22,7 +20,8 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
 
-    public int ChipsToPlaceRemains { get; private set; }
+    public int TeamOneChipToPlaceRemains { get; private set; }
+    public int TeamTwoChipToPlaceRemains { get; private set; }
 
     protected override void Awake()
     {
@@ -43,26 +42,32 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         teamOneChips = GameSettings.Instance.GetTeamChips(1);
         teamTwoChips = GameSettings.Instance.GetTeamChips(2);
 
-        ChipsToPlaceRemains = teamOneChips.Count + teamTwoChips.Count;
+        TeamOneChipToPlaceRemains = teamOneChips.Count;
+        TeamTwoChipToPlaceRemains = teamTwoChips.Count;
 
         gameTourManager.RollStartingTeam();
-        //InitializeTeams();
     }
 
-    private void InitializeTeams()
+    public void InitializeChip(Vector3 position, int team)
     {
-        for (int i = 0; i < teamOneChips.Count; i++)
-        {
-            Chip chip = Instantiate(ChipPrefab, teamOneSpawnPositions[i].position, Quaternion.identity);
-            chip.InitializeChip(teamOneChips[i], 1);
-        }
+        Chip chip = Instantiate(ChipPrefab, position, Quaternion.identity);
 
-        for (int i = 0; i < teamTwoChips.Count; i++)
-        {
-            Chip chip = Instantiate(ChipPrefab, teamTwoSpawnPositions[i].position, Quaternion.identity);
-            chip.InitializeChip(teamTwoChips[i], 2);
-        }
+        if (team == 1)
+            chip.InitializeChip(teamOneChips[TeamOneChipToPlaceRemains - 1], team);
+        else
+            chip.InitializeChip(teamTwoChips[TeamTwoChipToPlaceRemains - 1], team);
+    }
 
+    public ChipSO GetNextChipToPlace(int team)
+    {
+        if (team == 1)
+            return teamOneChips[TeamOneChipToPlaceRemains - 1];
+        else
+            return teamTwoChips[TeamTwoChipToPlaceRemains - 1];
+    }
+
+    public void SetTeamCount()
+    {
         chipTeamOneCount = teamOneChips.Count;
         chipTeamTwoCount = teamTwoChips.Count;
     }
@@ -99,8 +104,11 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         else return false;
     }
 
-    public void DecreaseRemainingsChipToPlace()
+    public void DecreaseRemainingsChipToPlace(int team)
     {
-        ChipsToPlaceRemains--;
+        if (team == 1)
+            TeamOneChipToPlaceRemains--;
+        else
+            TeamTwoChipToPlaceRemains--;
     }
 }

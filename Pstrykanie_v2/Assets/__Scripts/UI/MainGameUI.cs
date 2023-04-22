@@ -3,16 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainGameUI : MonoBehaviour
 {
+    private GameTourManager gameTourManager;
+    private GameManager gameManager;
+
+    [Header("Current GameState")]
     [SerializeField] TMP_Text currentGameStateText;
     [SerializeField] TMP_Text changingGameStateText;
+    [Header("Chip to Place")]
+    [SerializeField] GameObject teamOnePlace;
+    [SerializeField] GameObject teamTwoPlace;
+    [SerializeField] Image teamOneChipToPlace;
+    [SerializeField] Image teamTwoChipToPlace;
 
     private void Start()
     {
-        GameTourManager.Instance.OnStateChanged += GameTourManager_OnStateChanged;
-        GameTourManager.Instance.OnNextStateChanged += GameTourManager_OnNextStateChanged;
+        gameTourManager = GameTourManager.Instance;
+        gameManager = GameManager.Instance;
+
+        gameTourManager.OnStateChanged += GameTourManager_OnStateChanged;
+        gameTourManager.OnNextStateChanged += GameTourManager_OnNextStateChanged;
+        gameTourManager.OnPlacingChipEnded += GameTourManager_OnPlacingChipEnded;
 
         RefreshUI();
         ChangeChangingGameStateTextState(false);
@@ -29,17 +43,6 @@ public class MainGameUI : MonoBehaviour
         {
             ChangeChangingGameStateTextState(true, "Team 2");
         }
-
-        else if (args.nextGameState == GameState.PlacingChipsByTeamOne)
-        {
-            ChangeChangingGameStateTextState(true, "Team 1 Placing");
-        }
-
-        else if (args.nextGameState == GameState.PlacingChipsByTeamTwo)
-        {
-            ChangeChangingGameStateTextState(true, "Team 2 Placing");
-        }
-
         else
         {
             ChangeChangingGameStateTextState(false);
@@ -49,6 +52,12 @@ public class MainGameUI : MonoBehaviour
     private void GameTourManager_OnStateChanged(object sender, System.EventArgs e)
     {
         RefreshUI();
+    }
+
+    private void GameTourManager_OnPlacingChipEnded(object sender, EventArgs e)
+    {
+        teamOnePlace.gameObject.SetActive(false);
+        teamTwoPlace.gameObject.SetActive(false);
     }
 
     private void RefreshUI()
@@ -64,14 +73,32 @@ public class MainGameUI : MonoBehaviour
         if (GameTourManager.Instance.GetCurrentGameState() == GameState.PlacingChipsByTeamOne || GameTourManager.Instance.GetNextGameState() == GameState.PlacingChipsByTeamOne)
         {
             currentGameStateText.text = "Team 1 Placing";
+            ShowNextChip(1);
         }
         else if (GameTourManager.Instance.GetCurrentGameState() == GameState.PlacingChipsByTeamTwo || GameTourManager.Instance.GetNextGameState() == GameState.PlacingChipsByTeamTwo)
         {
             currentGameStateText.text = "Team 2 Placing";
+            ShowNextChip(2);
         }
         else
         {
             currentGameStateText.text = string.Empty;
+        }
+    }
+
+    private void ShowNextChip(int team)
+    {
+        if (team == 1)
+        {
+            teamOnePlace.gameObject.SetActive(true);
+            teamTwoPlace.gameObject.SetActive(false);
+            teamOneChipToPlace.sprite = gameManager.GetNextChipToPlace(1).Image;
+        }
+        else
+        {
+            teamTwoPlace.gameObject.SetActive(true);
+            teamOnePlace.gameObject.SetActive(false);
+            teamTwoChipToPlace.sprite = gameManager.GetNextChipToPlace(2).Image;
         }
     }
 
