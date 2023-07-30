@@ -13,6 +13,7 @@ public class Snapping : MonoBehaviour
     }
 
     private Chip chip;
+    private SurroundingsCheck surroundingsCheck;
 
     [SerializeField] Transform launchPoint;
 
@@ -34,6 +35,7 @@ public class Snapping : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         chip = GetComponent<Chip>();
+        surroundingsCheck = GetComponentInChildren<SurroundingsCheck>();
 
         line = GetComponentInChildren<LineRenderer>();
         lineVisual = line.GetComponent<LineVisual>();
@@ -160,10 +162,10 @@ public class Snapping : MonoBehaviour
         if (collision.gameObject.tag == "Chip" && collision.gameObject.TryGetComponent(out Rigidbody enemyRigidbody))
         {
             Vector3 direction = (collision.transform.position - transform.position).normalized;
-            float pushForce = pushPower * Mathf.Abs(rigidBody.velocity.z) * mass;
+            float pushForce = pushPower * Mathf.Abs(rigidBody.velocity.z + rigidBody.velocity.x) * mass;
             enemyRigidbody.AddForce(direction * pushForce);
         }
-    } 
+    }
 
     public void SetSpeed(float speed)
     {

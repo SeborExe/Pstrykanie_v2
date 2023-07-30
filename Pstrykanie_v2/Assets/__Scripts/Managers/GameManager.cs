@@ -7,7 +7,7 @@ using UnityEngine.Rendering.Universal;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
-    GameTourManager gameTourManager;
+    public GameTourManager GameTourManager { get; private set; }
 
     [Header("Chips")]
     [SerializeField] private Chip ChipPrefab;
@@ -30,7 +30,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     private void Start()
     {
-        gameTourManager = GameTourManager.Instance;
+        GameTourManager = GameTourManager.Instance;
 
         GetTeams();
         
@@ -45,7 +45,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         TeamOneChipToPlaceRemains = teamOneChips.Count;
         TeamTwoChipToPlaceRemains = teamTwoChips.Count;
 
-        gameTourManager.RollStartingTeam();
+        GameTourManager.RollStartingTeam();
     }
 
     public void InitializeChip(Vector3 position, int team)

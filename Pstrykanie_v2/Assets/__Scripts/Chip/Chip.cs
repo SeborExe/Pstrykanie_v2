@@ -8,6 +8,7 @@ public class Chip : MonoBehaviour
     Rigidbody rigidBody;
     Snapping snapping;
     MeshCollider meshCollider;
+    [SerializeField] private SurroundingsCheck surroundingsCheck;
 
     private int chipTeamID;
     private bool isPlaying = true;
@@ -31,6 +32,7 @@ public class Chip : MonoBehaviour
         snapping.SetStreatch(chipDetails.maxStretch);
         snapping.SetPushPower(chipDetails.pushPower);
         snapping.SetMass(chipDetails.mass);
+        surroundingsCheck.SetChanceToBetrayal(chipDetails.chanceToBetrayal);
 
         this.chipTeamID = chipTeamID;
     }

@@ -27,6 +27,7 @@ public class MainGameUI : MonoBehaviour
         gameTourManager.OnStateChanged += GameTourManager_OnStateChanged;
         gameTourManager.OnNextStateChanged += GameTourManager_OnNextStateChanged;
         gameTourManager.OnPlacingChipEnded += GameTourManager_OnPlacingChipEnded;
+        gameTourManager.OnGameOver += DisableUI;
 
         RefreshUI();
         ChangeChangingGameStateTextState(false);
@@ -107,4 +108,6 @@ public class MainGameUI : MonoBehaviour
         changingGameStateText.gameObject.SetActive(show);
         changingGameStateText.text = text;
     }
+
+    private void DisableUI(object sender, System.EventArgs e) => gameObject.SetActive(false);
 }
