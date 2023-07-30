@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class CreateTeamPopUp : MonoBehaviour
 {
     private RectTransform rectTransform;
-    private const float timeToMoveIntoCenter = 1f;
+    private const float timeToMoveIntoCenter = 0.5f;
     private List<ChipSO> teamMembers;
 
     [SerializeField] private Button confirmButton;
