@@ -30,6 +30,7 @@ public class Snapping : MonoBehaviour
     private Rigidbody rigidBody;
     private Vector3 currentPosition;
     private Vector3 snapForce;
+    private float currentStreatch;
 
     private void Awake()
     {
@@ -93,14 +94,18 @@ public class Snapping : MonoBehaviour
 
             currentPosition = Camera.main.ScreenToWorldPoint(mousePosition);
             SetStrips(currentPosition);
+
+            GameManager.Instance.currentSelectedChip = gameObject;
+            GameManager.Instance.SetCameraOrtoSize(currentStreatch / 4f, Time.deltaTime);
         }
         else
         {
             ResetStrips();
+            GameManager.Instance.SetDefaultCameraOrtoSize(Time.deltaTime);
         }
     }
 
-        private void CheckChipState()
+    private void CheckChipState()
     {
         if (currentState == ChipState.Moving)
         {
@@ -123,6 +128,7 @@ public class Snapping : MonoBehaviour
     {
         line.SetPosition(0, transform.position);
         line.SetPosition(1, transform.position);
+        currentStreatch = 0;
     }
 
     private void SetStrips(Vector3 position)
@@ -135,6 +141,11 @@ public class Snapping : MonoBehaviour
         {
             direction = direction.normalized * streatch; // Skalujemy wektor kierunkowy, aby jego d³ugoœæ nie przekracza³a 20
         }
+
+        if (distance > streatch)
+            distance = streatch;
+
+        currentStreatch = distance;
 
         Vector3 endPoint = launchPoint.position + direction; // Obliczamy koñcow¹ pozycjê linii
         endPoint.y = 0f; // Ustawiamy Y na 0, aby koñcówka linii by³a na p³aszczyŸnie XZ
@@ -151,6 +162,8 @@ public class Snapping : MonoBehaviour
     {
         rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
         line.gameObject.SetActive(false);
+
+        GameManager.Instance.currentSelectedChip = null;
 
         GameTourManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
         currentState = ChipState.Moving;

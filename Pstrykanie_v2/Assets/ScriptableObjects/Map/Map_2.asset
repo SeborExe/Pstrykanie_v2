@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: Map_2
   m_EditorClassIdentifier: 
   mapSceneName: Map_2
-  mapName: Mapiszcze
-  mapIcon: {fileID: -9095717837082945937, guid: bd3cb4af8406d4436a2ae8c2aafe1f8d,
-    type: 3}
+  mapName: "Kocio\u0142"
+  mapIcon: {fileID: 21300000, guid: 3a21f6ed37711594e9f1044fb1139d65, type: 3}

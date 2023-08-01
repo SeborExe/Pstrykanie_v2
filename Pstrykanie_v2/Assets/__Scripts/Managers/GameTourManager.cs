@@ -20,6 +20,10 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     [SerializeField] MeshRenderer teamBlueMeshRenderer;
     [SerializeField] MeshRenderer teamRedMeshRenderer;
 
+    [Header("Enviroment")]
+    [SerializeField] private TourBarrier barrier;
+    private bool isBarrierActive = true;
+
     public class OnNextStateChangedArgs : EventArgs
     {
         public GameState nextGameState;
@@ -153,11 +157,13 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         if (chipID == 1 && !wait && GameManager.Instance.CheckIfAnyTeamHasChip())
         {
             nextGameState = GameState.TeamTwoTurn;
+            DisableBarrier();
             ChangingTurn();
         }
         else if (chipID == 2 && !wait && GameManager.Instance.CheckIfAnyTeamHasChip())
         {
             nextGameState = GameState.TeamOneTurn;
+            DisableBarrier();
             ChangingTurn();
         }
         else
@@ -232,5 +238,14 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     public int GetWinningTeamID()
     {
         return winningTeamID;
+    }
+
+    private void DisableBarrier()
+    {
+        if (isBarrierActive)
+        {
+            barrier.gameObject.SetActive(false);
+            isBarrierActive = false;
+        }
     }
 }

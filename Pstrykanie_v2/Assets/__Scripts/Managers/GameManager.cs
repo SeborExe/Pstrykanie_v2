@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using static UnityEngine.Rendering.DebugUI;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
@@ -16,6 +17,12 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     [Header("Components")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
+
+    [Header("Camera info")]
+    [SerializeField] private float cameraSpeed;
+    private float defaultCameraLensOrtoSize = 38f;
+    private float currentCameraLensOrtoSize;
+    [HideInInspector] public GameObject currentSelectedChip;
 
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
@@ -110,5 +117,31 @@ public class GameManager : SingletonMonobehaviour<GameManager>
             TeamOneChipToPlaceRemains--;
         else
             TeamTwoChipToPlaceRemains--;
+    }
+
+    public float GetDefaultCameraOrtoSize() => defaultCameraLensOrtoSize;
+    public float GetCurrentCameraOrtoSize() => currentCameraLensOrtoSize;
+
+    public void SetCameraOrtoSize(float value, float deltaTime)
+    {
+        if (currentSelectedChip == null) return;
+
+        currentCameraLensOrtoSize = defaultCameraLensOrtoSize + value;
+
+        if (virtualCamera.m_Lens.OrthographicSize < currentCameraLensOrtoSize)
+        {
+            virtualCamera.m_Lens.OrthographicSize += deltaTime * cameraSpeed;
+        }
+    }
+
+    public void SetDefaultCameraOrtoSize(float deltaTime)
+    {
+        if (currentSelectedChip != null) return;
+
+        if (virtualCamera.m_Lens.OrthographicSize > defaultCameraLensOrtoSize)
+        {
+            virtualCamera.m_Lens.OrthographicSize -= deltaTime * (cameraSpeed / 3f);
+            currentCameraLensOrtoSize = virtualCamera.m_Lens.OrthographicSize;
+        }
     }
 }
