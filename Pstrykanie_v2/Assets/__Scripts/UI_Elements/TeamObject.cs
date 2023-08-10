@@ -26,6 +26,7 @@ public class TeamObject : MonoBehaviour
                 SelectTeamsUI.Instance.transform.position + new Vector3(0, -700, 0), Quaternion.identity);
             deleteTeamPopUp.transform.SetParent(SelectTeamsUI.Instance.transform);
             deleteTeamPopUp.Initialize(team);
+            deleteTeamPopUp.transform.localScale = Vector3.one;
         });
     }
 

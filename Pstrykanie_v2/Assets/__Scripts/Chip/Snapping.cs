@@ -13,7 +13,7 @@ public class Snapping : MonoBehaviour
     }
 
     private Chip chip;
-    private SurroundingsCheck surroundingsCheck;
+    private InputManager inputManager;
 
     [SerializeField] Transform launchPoint;
 
@@ -36,7 +36,6 @@ public class Snapping : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         chip = GetComponent<Chip>();
-        surroundingsCheck = GetComponentInChildren<SurroundingsCheck>();
 
         line = GetComponentInChildren<LineRenderer>();
         lineVisual = line.GetComponent<LineVisual>();
@@ -44,6 +43,8 @@ public class Snapping : MonoBehaviour
 
     private void Start()
     {
+        inputManager = InputManager.Instance;
+
         launchPoint.gameObject.SetActive(false);
 
         line.positionCount = 2;
@@ -69,7 +70,7 @@ public class Snapping : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (GameTourManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        if (GameTourManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID() && inputManager.IsSnapping)
         {
             isMouseDown = true;
         }
@@ -77,7 +78,7 @@ public class Snapping : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (GameTourManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID())
+        if (GameTourManager.Instance.GetCurrentGameStateTeamNumber() == chip.GetChipTeamID() && !inputManager.IsSnapping)
         {
             isMouseDown = false;
             Snap();

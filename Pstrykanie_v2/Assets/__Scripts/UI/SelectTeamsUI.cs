@@ -135,6 +135,7 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
 
         CreateTeamPopUp popUp = Instantiate(createTeamPopUp, transform.position + new Vector3(0, -700, 0), Quaternion.identity);
         popUp.transform.SetParent(transform);
+        popUp.transform.localScale = Vector3.one;
         popUp.Initialize(teamMembers);
     }
 
