@@ -33,7 +33,7 @@ public partial class @OhSnap : IInputActionCollection2, IDisposable
                     ""id"": ""10ec70b2-147e-4e50-addb-3fb011ccbe07"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Hold(duration=0.5,pressPoint=1.401298E-45)"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 }
             ],

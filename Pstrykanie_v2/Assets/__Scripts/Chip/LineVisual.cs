@@ -22,7 +22,12 @@ public class LineVisual : MonoBehaviour
         float lineLength = Mathf.Max(Math.Abs(direction.x), Mathf.Abs(direction.z));
         float percentMaxLength = lineLength / streatch;
 
-        if (percentMaxLength >= 0 && percentMaxLength < 0.35f)
+        if (percentMaxLength < 0.15f)
+        {
+            lineRenderer.startColor = Color.white;
+            lineRenderer.endColor = Color.white;
+        }
+        else if (percentMaxLength >= 0.15f && percentMaxLength < 0.35f)
         {
             lineRenderer.startColor = easyColor;
             lineRenderer.endColor = easyColor;

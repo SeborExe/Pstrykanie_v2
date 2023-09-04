@@ -31,6 +31,7 @@ public class Snapping : MonoBehaviour
     private Vector3 currentPosition;
     private Vector3 snapForce;
     private float currentStreatch;
+    private float maximumForceToReturn = 5000f;
 
     private void Awake()
     {
@@ -161,10 +162,13 @@ public class Snapping : MonoBehaviour
 
     private void Snap()
     {
-        rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
         line.gameObject.SetActive(false);
-
         GameManager.Instance.currentSelectedChip = null;
+
+        if (snapForce.magnitude < maximumForceToReturn)
+            return;
+
+        rigidBody.AddForce(new Vector3(snapForce.x, 0, snapForce.z));
 
         GameTourManager.Instance.ChangeGameState(chip.GetChipTeamID(), true);
         currentState = ChipState.Moving;
