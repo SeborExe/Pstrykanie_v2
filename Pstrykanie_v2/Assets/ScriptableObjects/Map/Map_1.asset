@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: Map_1
   m_EditorClassIdentifier: 
   mapSceneName: Map_1
-  mapName: Basic Map
-  mapIcon: {fileID: -9095717837082945937, guid: bd3cb4af8406d4436a2ae8c2aafe1f8d,
-    type: 3}
+  mapName: "\u0141awa"
+  mapIcon: {fileID: 21300000, guid: 880e65f3eb20ada459dc973dc07c2ed5, type: 3}

@@ -8,16 +8,15 @@ using UnityEngine.UI;
 public class MapSelectOption : MonoBehaviour
 {
     [SerializeField] TMP_Text mapName;
+    [SerializeField] private Image mapImage;
     private Button mapButton;
     private Image backgroundImage;
-    private Image buttonMapImage;
     private MapSO map;
 
     private void Awake()
     {
         backgroundImage = GetComponent<Image>();
-        mapButton = GetComponentInChildren<Button>();
-        buttonMapImage = mapButton.GetComponent<Image>();
+        mapButton = GetComponentInChildren<Button>();   
 
         SelectMapUI.OnMapChanged += SelectMapUI_OnMapChanged;
     }
@@ -45,7 +44,7 @@ public class MapSelectOption : MonoBehaviour
     {
         this.map = map;
         mapName.text = map.name;
-        buttonMapImage.sprite = map.mapIcon;
+        mapImage.sprite = map.mapIcon;
 
         UpdateUIChanges(map);
     }

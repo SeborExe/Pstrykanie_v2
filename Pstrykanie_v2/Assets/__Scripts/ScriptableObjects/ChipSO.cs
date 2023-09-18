@@ -12,5 +12,6 @@ public class ChipSO : ScriptableObject
     public float maxStretch = 10f;
     public float pushPower = 0.2f;
     public float mass = 10f;
+    [Range(0, 100)] public float chanceToBetrayal;
     public PhysicMaterial physicMaterial;
 }

@@ -8,6 +8,8 @@ public class Chip : MonoBehaviour
     Rigidbody rigidBody;
     Snapping snapping;
     MeshCollider meshCollider;
+    ChipSO chipDetails;
+    [SerializeField] private SurroundingsCheck surroundingsCheck;
 
     private int chipTeamID;
     private bool isPlaying = true;
@@ -22,31 +24,21 @@ public class Chip : MonoBehaviour
 
     public void InitializeChip(ChipSO chipDetails, int chipTeamID)
     {
+        this.chipDetails = chipDetails;
+
         chipRenderer.material.SetTexture("_BaseMap", chipDetails.Image.texture);
         transform.localScale = chipDetails.size;
         rigidBody.mass = chipDetails.mass;
         meshCollider.material = chipDetails.physicMaterial;
 
-        snapping.SetSpeed(chipDetails.speed);
-        snapping.SetStreatch(chipDetails.maxStretch);
-        snapping.SetPushPower(chipDetails.pushPower);
-        snapping.SetMass(chipDetails.mass);
+        snapping.SetChipDetails(chipDetails);
+        surroundingsCheck.SetChanceToBetrayal(chipDetails.chanceToBetrayal);
 
         this.chipTeamID = chipTeamID;
     }
 
-    public int GetChipTeamID()
-    {
-        return chipTeamID;
-    }
-
-    public bool IsPlaying()
-    {
-        return isPlaying;
-    }
-
-    public void DeDeactivateChip()
-    {
-        isPlaying = false;
-    }
+    public int GetChipTeamID() => chipTeamID;
+    public bool IsPlaying() => isPlaying;
+    public void DeDeactivateChip() => isPlaying = false;
+    public bool IsMetal() => chipDetails.isMetal;
 }

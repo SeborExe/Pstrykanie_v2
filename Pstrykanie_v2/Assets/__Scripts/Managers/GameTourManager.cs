@@ -7,7 +7,25 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 {
     public event EventHandler OnStateChanged;
     public event EventHandler OnGameOver;
+    public event EventHandler OnPlacingChipEnded;
     public event EventHandler<OnNextStateChangedArgs> OnNextStateChanged;
+
+    private GameManager gameManager;
+
+    [Header("Layer Masks")]
+    [SerializeField] LayerMask whatIsSpawnPointTeamOne;
+    [SerializeField] LayerMask whatIsSpawnPointTeamTwo;
+    [SerializeField] LayerMask whatIsChip;
+    [Header("Teams Location")]
+    [SerializeField] MeshRenderer teamBlueMeshRenderer;
+    [SerializeField] MeshRenderer teamRedMeshRenderer;
+
+    [Header("Enviroment")]
+    [SerializeField] private TourBarrier barrier;
+    private bool isBarrierActive = true;
+
+    List<Vector3> teamOneChips = new List<Vector3>();
+    List<Vector3> teamTwoChips = new List<Vector3>();
 
     public class OnNextStateChangedArgs : EventArgs
     {
@@ -19,6 +37,7 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     private GameState nextGameState;
 
     private int winningTeamID;
+    private bool placingComplete;
 
     protected override void Awake()
     {
@@ -27,7 +46,7 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 
     private void Start()
     {
-        RollStartingTeam();
+        gameManager = GameManager.Instance;
     }
 
     private void Update()
@@ -42,6 +61,140 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
                 OnNextStateChanged(this, new OnNextStateChangedArgs { nextGameState = GameState.None });
                 break;
         }
+
+        switch (currentState)
+        {
+            case GameState.PlacingChipsByTeamOne:
+                if (TryPlanceChip(1) && !placingComplete)
+                {
+                    teamBlueMeshRenderer.enabled = false;
+                    teamRedMeshRenderer.enabled = true;
+                    nextGameState = GameState.PlacingChipsByTeamTwo;
+                    ChangingTurn();
+                }
+                break;
+            case GameState.PlacingChipsByTeamTwo:
+                if (TryPlanceChip(2) && !placingComplete)
+                {
+                    teamBlueMeshRenderer.enabled = true;
+                    teamRedMeshRenderer.enabled = false;
+                    nextGameState = GameState.PlacingChipsByTeamOne;
+                    ChangingTurn();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private bool TryPlanceChip(int team)
+    {
+        if (team == 1)
+        {
+            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamOne, GameState.TeamTwoTurn, team);
+        }
+        else
+        {
+            return HandleRaycastOnPlacingChips(whatIsSpawnPointTeamTwo, GameState.TeamOneTurn, team);
+        }
+    }
+
+    private bool HandleRaycastOnPlacingChips(LayerMask layerMaskToPlaceChip, GameState nextGameStateToSetIfAllChipsOnBoard, int team)
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMaskToPlaceChip) && CheckCorrectDistance(hit.point, team))
+            {
+                gameManager.InitializeChip(hit.point, team);
+                gameManager.DecreaseRemainingsChipToPlace(team);
+                AddToTeam(team, hit.point);
+
+                if (gameManager.TeamOneChipToPlaceRemains == 0 && gameManager.TeamTwoChipToPlaceRemains == 0)
+                {
+                    placingComplete = true;
+                    gameManager.SetTeamCount();
+
+                    teamBlueMeshRenderer.enabled = false;
+                    teamRedMeshRenderer.enabled = false;
+
+                    OnPlacingChipEnded?.Invoke(this, EventArgs.Empty);
+
+                    nextGameState = nextGameStateToSetIfAllChipsOnBoard;
+                    ChangingTurn();
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool CheckCorrectDistance(Vector3 positionHit, int team)
+    {
+        float positionToNearestChip = GetNearestChip(positionHit, team);
+
+        Debug.Log(positionToNearestChip);
+
+        if (positionToNearestChip <= GameSettings.Instance.minimumDistanceBetweenChips)
+            return false;
+        else
+            return true;
+    }
+
+    private float GetNearestChip(Vector3 positionHit, int team)
+    {
+        switch (team)
+        {
+            case 1:
+                if (teamOneChips.Count == 0)
+                    return float.MaxValue;
+                else
+                {
+                    float nearestChip = float.MaxValue;
+                    foreach (var chip in teamOneChips)
+                    {
+                        if (Vector3.Distance(positionHit, chip) < nearestChip)
+                            nearestChip = Vector3.Distance(positionHit, chip);
+                    }
+
+                    return nearestChip;
+                }
+                break;
+            case 2:
+                if (teamTwoChips.Count == 0)
+                    return float.MaxValue;
+                else
+                {
+                    float nearestChip = float.MaxValue;
+                    foreach (var chip in teamTwoChips)
+                    {
+                        if (Vector3.Distance(positionHit, chip) < nearestChip)
+                            nearestChip = Vector3.Distance(positionHit, chip);
+                    }
+
+                    return nearestChip;
+                }
+                break;
+
+            default:
+                return float.MaxValue;
+        }
+    }
+
+    private void AddToTeam(int team, Vector3 chipPosition)
+    {
+        switch (team)
+        {
+            case 1:
+                teamOneChips.Add(chipPosition);
+                break;
+            case 2:
+                teamTwoChips.Add(chipPosition);
+                break;
+        }
     }
 
     private void ChangingTurn()
@@ -51,17 +204,19 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void RollStartingTeam()
+    public void RollStartingTeam()
     {
         int startingTeam = UnityEngine.Random.Range(1, 3);
         if (startingTeam == 1)
         {
-            nextGameState = GameState.TeamOneTurn;
+            teamBlueMeshRenderer.enabled = true;
+            nextGameState = GameState.PlacingChipsByTeamOne;
             ChangingTurn();
         }
         else
         {
-            nextGameState = GameState.TeamTwoTurn;
+            teamRedMeshRenderer.enabled = true;
+            nextGameState = GameState.PlacingChipsByTeamTwo;
             ChangingTurn();
         }
     }
@@ -71,11 +226,13 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         if (chipID == 1 && !wait && GameManager.Instance.CheckIfAnyTeamHasChip())
         {
             nextGameState = GameState.TeamTwoTurn;
+            DisableBarrier();
             ChangingTurn();
         }
         else if (chipID == 2 && !wait && GameManager.Instance.CheckIfAnyTeamHasChip())
         {
             nextGameState = GameState.TeamOneTurn;
+            DisableBarrier();
             ChangingTurn();
         }
         else
@@ -150,5 +307,14 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     public int GetWinningTeamID()
     {
         return winningTeamID;
+    }
+
+    private void DisableBarrier()
+    {
+        if (isBarrierActive)
+        {
+            barrier.gameObject.SetActive(false);
+            isBarrierActive = false;
+        }
     }
 }

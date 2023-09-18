@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class DeleteTeamPopUp : MonoBehaviour
 {
     private RectTransform rectTransform;
-    private const float timeToMoveIntoCenter = 1f;
+    private const float timeToMoveIntoCenter = 0.5f;
     private Team team;
 
     [SerializeField] private Button confirmButton;

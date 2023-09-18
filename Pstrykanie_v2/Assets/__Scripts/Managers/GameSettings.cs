@@ -13,6 +13,9 @@ public class GameSettings : SingletonMonobehaviour<GameSettings>
     private List<ChipSO> teamTwoChips = new List<ChipSO>();
     private MapSO selectedMap;
 
+    public readonly float metalVSmetalMultiplier = 1.35f;
+    public readonly float minimumDistanceBetweenChips = 15f;
+
     protected override void Awake()
     {
         base.Awake();

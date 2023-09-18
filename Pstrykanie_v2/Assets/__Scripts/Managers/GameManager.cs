@@ -4,21 +4,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using static UnityEngine.Rendering.DebugUI;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
+    public GameTourManager GameTourManager { get; private set; }
+
     [Header("Chips")]
+    [SerializeField] private Chip ChipPrefab;
     List<ChipSO> teamOneChips = new List<ChipSO>();
     List<ChipSO> teamTwoChips = new List<ChipSO>();
-    [SerializeField] List<Transform> teamOneSpawnPositions = new List<Transform>();
-    [SerializeField] List<Transform> teamTwoSpawnPositions = new List<Transform>();
-    [SerializeField] private Chip ChipPrefab;
 
     [Header("Components")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
+    [Header("Camera info")]
+    [SerializeField] private float cameraSpeed;
+    private float defaultCameraLensOrtoSize = 38f;
+    private float currentCameraLensOrtoSize;
+    [HideInInspector] public GameObject currentSelectedChip;
+
     private int chipTeamOneCount;
     private int chipTeamTwoCount;
+
+    public int TeamOneChipToPlaceRemains { get; private set; }
+    public int TeamTwoChipToPlaceRemains { get; private set; }
 
     protected override void Awake()
     {
@@ -27,9 +37,46 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     private void Start()
     {
+        GameTourManager = GameTourManager.Instance;
+
         GetTeams();
         
         DeadZone.Instance.OnChipFall += DeadZone_OnChipFall;
+    }
+
+    private void GetTeams()
+    {
+        teamOneChips = GameSettings.Instance.GetTeamChips(1);
+        teamTwoChips = GameSettings.Instance.GetTeamChips(2);
+
+        TeamOneChipToPlaceRemains = teamOneChips.Count;
+        TeamTwoChipToPlaceRemains = teamTwoChips.Count;
+
+        GameTourManager.RollStartingTeam();
+    }
+
+    public void InitializeChip(Vector3 position, int team)
+    {
+        Chip chip = Instantiate(ChipPrefab, position, Quaternion.identity);
+
+        if (team == 1)
+            chip.InitializeChip(teamOneChips[TeamOneChipToPlaceRemains - 1], team);
+        else
+            chip.InitializeChip(teamTwoChips[TeamTwoChipToPlaceRemains - 1], team);
+    }
+
+    public ChipSO GetNextChipToPlace(int team)
+    {
+        if (team == 1)
+            return teamOneChips[TeamOneChipToPlaceRemains - 1];
+        else
+            return teamTwoChips[TeamTwoChipToPlaceRemains - 1];
+    }
+
+    public void SetTeamCount()
+    {
+        chipTeamOneCount = teamOneChips.Count;
+        chipTeamTwoCount = teamTwoChips.Count;
     }
 
     private void DeadZone_OnChipFall(object sender, DeadZone.OnChipFallArgs args)
@@ -44,32 +91,6 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         }
 
         GameTourManager.Instance.CheckForGameOver();
-    }
-
-    private void GetTeams()
-    {
-        teamOneChips = GameSettings.Instance.GetTeamChips(1);
-        teamTwoChips = GameSettings.Instance.GetTeamChips(2);
-
-        InitializeTeams();
-    }
-
-    private void InitializeTeams()
-    {
-        for (int i = 0; i < teamOneChips.Count; i++)
-        {
-            Chip chip = Instantiate(ChipPrefab, teamOneSpawnPositions[i].position, Quaternion.identity);
-            chip.InitializeChip(teamOneChips[i], 1);
-        }
-
-        for (int i = 0; i < teamTwoChips.Count; i++)
-        {
-            Chip chip = Instantiate(ChipPrefab, teamTwoSpawnPositions[i].position, Quaternion.identity);
-            chip.InitializeChip(teamTwoChips[i], 2);
-        }
-
-        chipTeamOneCount = teamOneChips.Count;
-        chipTeamTwoCount = teamTwoChips.Count;
     }
 
     public void ShakeCamera(float amplitude, float frequency, float time)
@@ -88,5 +109,39 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         if (teamNumber == 1) return chipTeamOneCount != 0;
         if (teamNumber == 2) return chipTeamTwoCount != 0;
         else return false;
+    }
+
+    public void DecreaseRemainingsChipToPlace(int team)
+    {
+        if (team == 1)
+            TeamOneChipToPlaceRemains--;
+        else
+            TeamTwoChipToPlaceRemains--;
+    }
+
+    public float GetDefaultCameraOrtoSize() => defaultCameraLensOrtoSize;
+    public float GetCurrentCameraOrtoSize() => currentCameraLensOrtoSize;
+
+    public void SetCameraOrtoSize(float value, float deltaTime)
+    {
+        if (currentSelectedChip == null) return;
+
+        currentCameraLensOrtoSize = defaultCameraLensOrtoSize + value;
+
+        if (virtualCamera.m_Lens.OrthographicSize < currentCameraLensOrtoSize)
+        {
+            virtualCamera.m_Lens.OrthographicSize += deltaTime * cameraSpeed;
+        }
+    }
+
+    public void SetDefaultCameraOrtoSize(float deltaTime)
+    {
+        if (currentSelectedChip != null) return;
+
+        if (virtualCamera.m_Lens.OrthographicSize > defaultCameraLensOrtoSize)
+        {
+            virtualCamera.m_Lens.OrthographicSize -= deltaTime * (cameraSpeed / 3f);
+            currentCameraLensOrtoSize = virtualCamera.m_Lens.OrthographicSize;
+        }
     }
 }

@@ -47,11 +47,11 @@ public class TourVisual : SingletonMonobehaviour<TourVisual>
             vignette.intensity.value = 0.25f;
         }
 
-        if (nextTeamTurn == GameState.TeamOneTurn)
+        if (nextTeamTurn == GameState.TeamOneTurn || nextTeamTurn == GameState.PlacingChipsByTeamOne)
         {
             vignette.color.value = Color.blue;
         }
-        else if (nextTeamTurn == GameState.TeamTwoTurn)
+        else if (nextTeamTurn == GameState.TeamTwoTurn || nextTeamTurn == GameState.PlacingChipsByTeamTwo)
         {
             vignette.color.value = Color.red;
         }

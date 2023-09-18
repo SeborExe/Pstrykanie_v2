@@ -19,4 +19,5 @@ MonoBehaviour:
   maxStretch: 20
   pushPower: 50
   mass: 10
+  chanceToBetrayal: 30
   physicMaterial: {fileID: 13400000, guid: 99389f7964ae3ac4d8a92ccf57cb3dbe, type: 2}

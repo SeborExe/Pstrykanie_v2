@@ -1,22 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ChipObject : MonoBehaviour
 {
-    private Image chipIcon;
+    [SerializeField] private Image chipIcon;
+    [SerializeField] private Image metalFrame;
+    [SerializeField] private TMP_Text assignText;
     private ChipSO chip;
-
-    private void Awake()
-    {
-        chipIcon = GetComponentInChildren<Image>();
-    }
 
     public void Initialize(ChipSO chip)
     {
         this.chip = chip;
         chipIcon.sprite = chip.Image;
+
+        if (!chip.isMetal)
+        {
+            metalFrame.gameObject.SetActive(false);
+            assignText.gameObject.SetActive(false);
+        }
     }
 
     public ChipSO GetChipData()
