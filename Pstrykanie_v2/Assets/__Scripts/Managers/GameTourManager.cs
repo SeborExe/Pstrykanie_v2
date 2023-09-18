@@ -24,6 +24,9 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
     [SerializeField] private TourBarrier barrier;
     private bool isBarrierActive = true;
 
+    List<Vector3> teamOneChips = new List<Vector3>();
+    List<Vector3> teamTwoChips = new List<Vector3>();
+
     public class OnNextStateChangedArgs : EventArgs
     {
         public GameState nextGameState;
@@ -98,13 +101,14 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
 
     private bool HandleRaycastOnPlacingChips(LayerMask layerMaskToPlaceChip, GameState nextGameStateToSetIfAllChipsOnBoard, int team)
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMaskToPlaceChip))
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMaskToPlaceChip) && CheckCorrectDistance(hit.point, team))
             {
                 gameManager.InitializeChip(hit.point, team);
                 gameManager.DecreaseRemainingsChipToPlace(team);
+                AddToTeam(team, hit.point);
 
                 if (gameManager.TeamOneChipToPlaceRemains == 0 && gameManager.TeamTwoChipToPlaceRemains == 0)
                 {
@@ -126,6 +130,71 @@ public class GameTourManager : SingletonMonobehaviour<GameTourManager>
         }
 
         return false;
+    }
+
+    private bool CheckCorrectDistance(Vector3 positionHit, int team)
+    {
+        float positionToNearestChip = GetNearestChip(positionHit, team);
+
+        Debug.Log(positionToNearestChip);
+
+        if (positionToNearestChip <= GameSettings.Instance.minimumDistanceBetweenChips)
+            return false;
+        else
+            return true;
+    }
+
+    private float GetNearestChip(Vector3 positionHit, int team)
+    {
+        switch (team)
+        {
+            case 1:
+                if (teamOneChips.Count == 0)
+                    return float.MaxValue;
+                else
+                {
+                    float nearestChip = float.MaxValue;
+                    foreach (var chip in teamOneChips)
+                    {
+                        if (Vector3.Distance(positionHit, chip) < nearestChip)
+                            nearestChip = Vector3.Distance(positionHit, chip);
+                    }
+
+                    return nearestChip;
+                }
+                break;
+            case 2:
+                if (teamTwoChips.Count == 0)
+                    return float.MaxValue;
+                else
+                {
+                    float nearestChip = float.MaxValue;
+                    foreach (var chip in teamTwoChips)
+                    {
+                        if (Vector3.Distance(positionHit, chip) < nearestChip)
+                            nearestChip = Vector3.Distance(positionHit, chip);
+                    }
+
+                    return nearestChip;
+                }
+                break;
+
+            default:
+                return float.MaxValue;
+        }
+    }
+
+    private void AddToTeam(int team, Vector3 chipPosition)
+    {
+        switch (team)
+        {
+            case 1:
+                teamOneChips.Add(chipPosition);
+                break;
+            case 2:
+                teamTwoChips.Add(chipPosition);
+                break;
+        }
     }
 
     private void ChangingTurn()

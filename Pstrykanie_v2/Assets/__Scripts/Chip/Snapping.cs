@@ -20,10 +20,7 @@ public class Snapping : MonoBehaviour
     private LineRenderer line;
     private LineVisual lineVisual;
 
-    private float speed;
-    private float streatch;
-    private float pushPower;
-    private float mass;
+    private ChipSO chipDetails;
     private ChipState currentState = ChipState.Idle;
 
     private bool isMouseDown;
@@ -139,22 +136,22 @@ public class Snapping : MonoBehaviour
         direction.y = 0f; // Ustawiamy Y na 0, aby koñcówka linii by³a na p³aszczyŸnie XZ
         float distance = direction.magnitude; // Obliczamy d³ugoœæ wektora
 
-        if (distance > streatch)
+        if (distance > chipDetails.maxStretch)
         {
-            direction = direction.normalized * streatch; // Skalujemy wektor kierunkowy, aby jego d³ugoœæ nie przekracza³a 20
+            direction = direction.normalized * chipDetails.maxStretch; // Skalujemy wektor kierunkowy, aby jego d³ugoœæ nie przekracza³a 20
         }
 
-        if (distance > streatch)
-            distance = streatch;
+        if (distance > chipDetails.maxStretch)
+            distance = chipDetails.maxStretch;
 
         currentStreatch = distance;
 
         Vector3 endPoint = launchPoint.position + direction; // Obliczamy koñcow¹ pozycjê linii
         endPoint.y = 0f; // Ustawiamy Y na 0, aby koñcówka linii by³a na p³aszczyŸnie XZ
 
-        snapForce = (endPoint - launchPoint.position) * speed * -1;
+        snapForce = (endPoint - launchPoint.position) * chipDetails.speed * -1;
 
-        lineVisual.ChangeLineColor(direction, streatch);
+        lineVisual.ChangeLineColor(direction, chipDetails.maxStretch);
 
         line.SetPosition(0, launchPoint.position);
         line.SetPosition(1, endPoint);
@@ -179,29 +176,35 @@ public class Snapping : MonoBehaviour
     {
         if (collision.gameObject.tag == "Chip" && collision.gameObject.TryGetComponent(out Rigidbody enemyRigidbody))
         {
+            CheckSpecialConditions(collision, out float Multiplier);
+
             Vector3 direction = (collision.transform.position - transform.position).normalized;
-            float pushForce = pushPower * Mathf.Abs(rigidBody.velocity.z + rigidBody.velocity.x) * mass;
-            enemyRigidbody.AddForce(direction * pushForce);
+            enemyRigidbody.AddForce(direction * CalculatePushForce() * Multiplier);
         }
     }
 
-    public void SetSpeed(float speed)
+    private void CheckSpecialConditions(Collision collision, out float multiplier)
     {
-        this.speed = speed;
+        multiplier = 1.0f;
+
+        CheckIfBothChipAreMetal(ref multiplier, collision);
     }
 
-    public void SetStreatch(float streatch)
+    private void CheckIfBothChipAreMetal(ref float multiplier, Collision collision)
     {
-        this.streatch = streatch;
+        if (chipDetails.isMetal && collision.gameObject.GetComponent<Chip>().IsMetal())
+            multiplier = GameSettings.Instance.metalVSmetalMultiplier;
     }
 
-    public void SetPushPower(float pushPower)
+    private float CalculatePushForce()
     {
-        this.pushPower = pushPower;
+        float totalForce = 0;
+
+        totalForce += chipDetails.pushPower * Mathf.Abs(rigidBody.velocity.magnitude) * chipDetails.mass;
+
+        Debug.Log(totalForce);
+        return totalForce;
     }
 
-    public void SetMass(float mass)
-    {
-        this.mass = mass;
-    }
+    public void SetChipDetails(ChipSO chipDetails) => this.chipDetails = chipDetails;
 }
