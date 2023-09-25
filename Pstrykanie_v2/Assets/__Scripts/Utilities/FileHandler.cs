@@ -27,7 +27,7 @@ public static class FileHandler
 
     private static string GetPath(string fileName)
     {
-        return Application.persistentDataPath+ "/" + fileName;
+        return Application.persistentDataPath+ "/" + fileName; //C:\Users\<user>\AppData\LocalLow\<company name>
     }
 
     private static void WriteFile(string path, string content)

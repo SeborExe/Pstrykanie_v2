@@ -43,7 +43,7 @@ public class MapSelectOption : MonoBehaviour
     public void Initialize(MapSO map)
     {
         this.map = map;
-        mapName.text = map.name;
+        mapName.text = map.mapName;
         mapImage.sprite = map.mapIcon;
 
         UpdateUIChanges(map);

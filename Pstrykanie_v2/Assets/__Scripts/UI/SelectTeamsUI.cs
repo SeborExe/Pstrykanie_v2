@@ -152,17 +152,23 @@ public class SelectTeamsUI : SingletonMonobehaviour<SelectTeamsUI>
 
     private void InitializeSavedTeams()
     {
-        foreach(Transform child in savedTeamsContainerArchon)
+        if (savedTeamsContainerArchon.childCount > 0)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in savedTeamsContainerArchon)
+            {
+                Destroy(child.gameObject);
+            }
         }
 
-        foreach (Team team in teams)
+        if (teams.Count > 0)
         {
-            TeamObject teamObject = Instantiate(teamObjectPrefab, savedTeamsContainerArchon);
-            teamObject.SetTeam(team);
+            foreach (Team team in teams)
+            {
+                TeamObject teamObject = Instantiate(teamObjectPrefab, savedTeamsContainerArchon);
+                teamObject.SetTeam(team);
+            }
         }
-           
+          
     }
 
     public void LoadTeamFromSaved(int teamID, List<ChipSO> team)
