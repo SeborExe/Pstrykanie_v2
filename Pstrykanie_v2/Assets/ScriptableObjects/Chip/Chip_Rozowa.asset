@@ -15,9 +15,9 @@ MonoBehaviour:
   Image: {fileID: 21300000, guid: 4eec9022b81fb9d4986212c574f17427, type: 3}
   isMetal: 0
   size: {x: 3, y: 1, z: 3}
-  speed: 1500
-  maxStretch: 20
+  speed: 1600
+  maxStretch: 15
   pushPower: 50
-  mass: 10
-  chanceToBetrayal: 0
+  mass: 11.5
+  chanceToBetrayal: 2
   physicMaterial: {fileID: 13400000, guid: 99389f7964ae3ac4d8a92ccf57cb3dbe, type: 2}
